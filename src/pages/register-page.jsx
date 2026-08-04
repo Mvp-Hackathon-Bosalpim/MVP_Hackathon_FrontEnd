@@ -16,7 +16,7 @@ const UPLOAD_NOTICE = [
 
 function RegisterPage() {
   return (
-    <section className="h-full w-full p-20">
+    <section className="h-full w-full px-20 py-10">
       <header className="mb-4 flex items-center gap-4">
         <DownloadIcon />
 

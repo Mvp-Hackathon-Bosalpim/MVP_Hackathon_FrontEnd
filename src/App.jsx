@@ -11,10 +11,12 @@ const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
-    children: [{ path: "/", element: <DashboardPage /> }],
+    children: [
+      { path: "/", element: <DashboardPage /> },
+      { path: "/register", element: <RegisterPage /> },
+    ],
   },
   { path: "*", element: <NotFoundPage /> },
-  { path: "/register", element: <RegisterPage /> },
 ]);
 
 function App() {
