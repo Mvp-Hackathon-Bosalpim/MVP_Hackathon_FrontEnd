@@ -9,22 +9,22 @@ const NAV_ITEMS = [
 
 export default function Header() {
   return (
-    <header className="h-16 px-6 bg-surface-100 border-b border-border">
-      <div className="h-full flex items-center justify-between">
+    <header className="bg-surface-100 border-border h-16 border-b px-6">
+      <div className="flex h-full items-center justify-between">
         {/* 왼쪽: 로고 + 네비게이션 */}
-        <div className="h-full flex items-center gap-8">
-          <span className="text-xl font-bold text-primary-navy">ComfoziAI</span>
+        <div className="flex h-full items-center gap-8">
+          <span className="text-primary-navy text-xl font-bold">ComfoziAI</span>
 
-          <nav className="h-full flex items-center gap-6">
+          <nav className="flex h-full items-center gap-6">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `h-full flex items-center px-1 text-lg border-b-2 transition-colors ${
+                  `flex h-full items-center border-b-2 px-1 text-lg transition-colors ${
                     isActive
                       ? "text-primary-navy border-primary-gold font-bold"
-                      : "text-gray-300 border-transparent hover:text-gray-500"
+                      : "border-transparent text-gray-300 hover:text-gray-500"
                   }`
                 }
               >
@@ -35,14 +35,14 @@ export default function Header() {
         </div>
 
         {/* 오른쪽: 알림 + 프로필 */}
-        <div className="h-full flex items-center gap-4">
-          <button className="text-gray-300 hover:text-primary-navy">
+        <div className="flex h-full items-center gap-4">
+          <button className="hover:text-primary-navy text-gray-300">
             <Bell size={20} />
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-muted" />
-            <span className="text-base text-primary-navy">관리자</span>
+            <div className="bg-muted h-8 w-8 rounded-full" />
+            <span className="text-primary-navy text-base">관리자</span>
           </div>
         </div>
       </div>
