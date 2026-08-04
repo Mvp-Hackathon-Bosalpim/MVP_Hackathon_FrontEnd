@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import MainLayout from './components/layout/main-layout'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
 
@@ -8,13 +9,12 @@ const queryClient = new QueryClient()
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <HomePage />,
+    element: <MainLayout />,
+    children: [
+      { path: '/', element: <HomePage /> },
+    ],
   },
-  {
-    path: '*',
-    element: <NotFoundPage />,
-  },
+  { path: '*', element: <NotFoundPage /> },
 ])
 
 function App() {
