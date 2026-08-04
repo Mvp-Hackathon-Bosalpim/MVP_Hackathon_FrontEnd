@@ -127,8 +127,13 @@
   }
 }
 
-body {
-  margin: 0;
+html {
+  height: 100vh;
+}
+
+body,
+#root {
+  background-color: var(--color-surface-100);
 }
 
 @theme inline {
