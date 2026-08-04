@@ -101,7 +101,9 @@
   --surface-0: #ffffff;
   --surface-100: #f6f4f0;
   --surface-200: #ece9e3;
+  --surface-300: #d8d2c5;
   --gray-100: #aeb7c2;
+  --gray-200: #dee1e5; 
   --gray-300: #667085;
   --gray-500: #344054;
   --gray-700: #1d2939;
@@ -176,7 +178,9 @@ body,
   --color-surface-0: var(--surface-0);
   --color-surface-100: var(--surface-100);
   --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
   --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
   --color-gray-300: var(--gray-300);
   --color-gray-500: var(--gray-500);
   --color-gray-700: var(--gray-700);
