@@ -1,32 +1,46 @@
 import { useState } from "react";
 import {
-  FileText, Clock, AlertTriangle, CheckCircle,
-  LineChart, Percent, Upload, PenLine, ChevronRight,
+  FileText, Clock, AlertTriangle,
+  LineChart, PenLine, ChevronRight,
 } from "lucide-react";
+import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import StatCard from "../../components/ui/stat-card";
 import QuickActionButton from "../../components/ui/quick-action-button";
 import PriorityReviewItem from "../../components/ui/priority-review-item";
 import ExportHistoryTable from "../../components/ui/export-history-table";
+import { useNavigate } from "react-router-dom";
+import UploadIcon from "@/assets/icons/upload-icon.svg?react";
 
 const OVERVIEW_STATS = [
   { icon: FileText, label: "전체 건수", unit: "건" },
   { icon: Clock, label: "검수 대기", unit: "건" },
-  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건" ,iconColor: "text-primary-gold"},
-  { icon: CheckCircle, label: "승인 완료", unit: "건" },
+  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
+  { icon: SuccessCircleIcon, label: "승인 완료", unit: "건" },
 ];
 
 const PRODUCTIVITY_STATS = [
   { icon: LineChart, label: "전체 건수", unit: "건" },
   { icon: Clock, label: "평균 검수 시간", unit: "" },
   { icon: AlertTriangle, label: "오류 발생률", unit: "%", iconColor: "text-primary-gold" },
-  { icon: Percent, label: "품질/정확도", unit: "%" },
+  { icon: SuccessCircleIcon, label: "품질/정확도", unit: "%" },
+];
+
+const PRIORITY_ITEMS = [
+  { order: 1, type: "missing", title: "누락 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "high" },
+  { order: 2, type: "duplicate", title: "중복 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "medium" },
+  { order: 3, type: "mismatch", title: "불일치 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "low" },
 ];
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [exportRecords] = useState([]);
 
+  const handleFileSelect = (file) => {
+    navigate("/register", { state: { uploadFile: file } });
+  };
+
   return (
-    <div className="max-w-[2000px] mx-auto p-6 space-y-10">
+    <div className="max-w-[1300px] mx-auto px-6 py-6 space-y-6">
       {/* 1. 전체 현황 */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {OVERVIEW_STATS.map((stat) => (
@@ -47,40 +61,39 @@ export default function DashboardPage() {
       {/* 3. 빠른 실행 + 우선 검수 목록 */}
       <section className="grid grid-cols-1 lg:grid-cols-[1fr_3fr] gap-5 h-full">
         <div className="bg-surface-0 border border-surface-200 rounded-lg overflow-hidden flex flex-col h-full">
-            <div className="px-4 py-3">
-                <h2 className="text-lg font-bold text-gray-700">빠른 실행</h2>
-            </div>
-            <div className="flex-1 flex flex-col gap-5 px-4 pb-4 mt-2">
-                <QuickActionButton icon={Upload} label="+신규 파일 업로드" onClick={() => {}} />
-                <QuickActionButton icon={PenLine} label="+수기 등록" onClick={() => {}} />
-            </div>
+          <div className="px-4 py-3">
+            <h2 className="text-lg font-bold text-gray-700">빠른 실행</h2>
+          </div>
+          <div className="flex-1 flex flex-col gap-5 px-4 pb-4 mt-2">
+            <QuickActionButton icon={UploadIcon} label="+신규 파일 업로드" onFileSelect={handleFileSelect} />
+            <QuickActionButton icon={PenLine} label="+수기 등록" onClick={() => navigate("/register")} />
+          </div>
         </div>
 
-        <div className="bg-surface-0 border border-surface-200 rounded-lg overflow-hidden">
+        <div className="bg-surface-0 border border-surface-200 rounded-lg overflow-hidden flex flex-col h-full">
           <div className="flex items-center justify-between px-4 py-3 bg-surface-0 border-b border-surface-200">
             <h2 className="text-lg font-bold text-gray-700">우선 검수 필요 목록</h2>
-            <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+            <button onClick={() => navigate("/inbox")} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
               전체보기 <ChevronRight size={16} />
             </button>
           </div>
           <div className="flex-1 flex flex-col justify-evenly divide-y divide-surface-200 px-4">
-            {[1, 2, 3].map((order) => (
-              <PriorityReviewItem key={order} order={order} />
+            {PRIORITY_ITEMS.map((item) => (
+              <PriorityReviewItem key={item.order} {...item} />
             ))}
           </div>
         </div>
       </section>
-
       {/* 4. 최근 데이터 내보내기 이력 */}
       <section className="bg-surface-0 border border-surface-200 rounded-lg overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-surface-300 ">
-            <h2 className="text-lg font-bold text-gray-700">최근 데이터 내보내기 이력</h2>
-            <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
-                전체보기 <ChevronRight size={16} />
-            </button>
+          <h2 className="text-lg font-bold text-gray-700">최근 데이터 내보내기 이력</h2>
+          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+            전체보기 <ChevronRight size={16} />
+          </button>
         </div>
         <ExportHistoryTable records={exportRecords} />
-        </section>
+      </section>
     </div>
   );
 }
