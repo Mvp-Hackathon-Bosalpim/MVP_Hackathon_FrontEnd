@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import DownloadIcon from "@/assets/icons/download-icon.svg?react";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
 import { PenLine } from "lucide-react";
@@ -12,6 +13,7 @@ const TABS = [
 ];
 
 function RegisterPage() {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("upload");
 
   return (
@@ -51,7 +53,8 @@ function RegisterPage() {
       </div>
 
       {activeTab === "upload" && (
-        <FileUploadSection onGoToManualEntry={() => setActiveTab("manual")} />
+        <FileUploadSection onGoToManualEntry={() => setActiveTab("manual")}
+          initialFile={location.state?.uploadFile} />
       )}
       {activeTab === "manual" && <ManualEntrySection />}
     </section>
