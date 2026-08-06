@@ -36,7 +36,7 @@ export default function DashboardPage() {
   const [exportRecords] = useState([]);
 
   const handleFileSelect = (file) => {
-    navigate("/register", { state: { uploadFile: file } });
+    navigate("/register", { state: { uploadFile: "upload", uploadFile: file } });
   };
 
   return (
