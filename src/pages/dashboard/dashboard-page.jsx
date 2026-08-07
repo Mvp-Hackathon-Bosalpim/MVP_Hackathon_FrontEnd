@@ -36,7 +36,7 @@ export default function DashboardPage() {
   const [exportRecords] = useState([]);
 
   const handleFileSelect = (file) => {
-    navigate("/register", { state: { uploadFile: file } });
+    navigate("/register", { state: { defaultTab: "upload", uploadFile: file } });
   };
 
   return (
@@ -66,7 +66,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex-1 flex flex-col gap-5 px-4 pb-4 mt-2">
             <QuickActionButton icon={UploadIcon} label="+신규 파일 업로드" onFileSelect={handleFileSelect} />
-            <QuickActionButton icon={PenLine} label="+수기 등록" onClick={() => navigate("/register")} />
+            <QuickActionButton icon={PenLine} label="+수기 등록" onClick={() => navigate("/register", { state: { defaultTab: "manual" } })} />
           </div>
         </div>
 

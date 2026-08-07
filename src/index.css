@@ -107,6 +107,10 @@
   --gray-300: #667085;
   --gray-500: #344054;
   --gray-700: #1d2939;
+  --color-state-error: #AD211D;
+  --color-state-success: #1E9800;
+  --color-state-warning: #E38359;
+  --color-state-gold: #D5A548;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -184,6 +188,10 @@ body,
   --color-gray-300: var(--gray-300);
   --color-gray-500: var(--gray-500);
   --color-gray-700: var(--gray-700);
+  --color-state-error: var(--color-state-error);
+  --color-state-success: var(--color-state-success);
+  --color-state-warning: var(--color-state-warning);
+  --color-state-gold: var(--color-state-gold);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);

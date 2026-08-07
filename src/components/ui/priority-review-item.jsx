@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { FileText, AlertTriangle } from "lucide-react";
 
 const TYPE_STYLES = {
-  missing: { label: "누락", icon: AlertTriangle, iconColor: "text-[#AD211D]", tagColor: "text-[#AD211D] border-[#AD211D]" },
-  duplicate: { label: "중복", icon: FileText, iconColor: "text-[#F07800]", tagColor: "text-[#F07800] border-[#F07800]" },
-  mismatch: { label: "불일치", icon: AlertTriangle, iconColor: "text-[#D5A548]", tagColor: "text-[#D5A548] border-[#D5A548]" },
+  missing: { label: "누락", icon: AlertTriangle, iconColor: "text-state-error", tagColor: "text-state-error border-state-error" },
+  duplicate: { label: "중복", icon: FileText, iconColor: "text-state-warning", tagColor: "text-state-warning border-state-warning" },
+  mismatch: { label: "불일치", icon: AlertTriangle, iconColor: "text-state-gold", tagColor: "text-state-gold border-state-gold" },
 };
 
 const SEVERITY_STYLES = {
