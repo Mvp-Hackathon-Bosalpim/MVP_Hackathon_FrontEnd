@@ -46,7 +46,7 @@ export default function FileUploadSection({ onGoToManualEntry }) {
     return (
         <>
             <div>
-                <h4 className="mb-5 text-[28px] font-bold text-gray-700">
+                <h4 className="mb-4 text-[28px] font-bold text-gray-700">
                     1. 파일 업로드
                 </h4>
                 <div className="flex items-stretch gap-4">
@@ -92,13 +92,13 @@ function FileUploader({ onFileSelected, onGoToManualEntry }) {
     };
 
     return (
-        <div className="flex h-full w-2/3 flex-1 flex-col rounded-lg border border-gray-100 bg-white p-4">
+        <div className="flex h-full w-2/3 flex-col rounded-lg border border-gray-100 bg-white p-4">
             <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 className={cn(
-                    "flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-19 transition-colors",
+                    "flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-8 transition-colors",
                     isDragging ? "border-primary-navy bg-surface-100" : "border-gray-300",
                 )}
             >
@@ -106,14 +106,14 @@ function FileUploader({ onFileSelected, onGoToManualEntry }) {
                 <p className="text-[28px] font-bold text-gray-700">
                     XLSX 또는 CSV 파일을 이곳에 드래그하세요
                 </p>
-                <span className="my-1 block text-[24px] text-gray-300">또는</span>
+                <span className="my-1 block text-[20px] text-gray-300">또는</span>
 
-                <label className="rounded-sm border-2 border-gray-100 px-4 py-1.5 text-[24px] text-gray-500">
+                <label className="rounded-sm border-2 border-gray-100 px-4 py-1.5 text-[22px] text-gray-500">
                     파일 선택
                     <input type="file" accept=".xlsx,.csv" className="hidden" onChange={handleInputChange} />
                 </label>
 
-                <span className="text-[24px] text-gray-300">
+                <span className="text-[20px] text-gray-300">
                     지원 형식 : xlsx, csv ...
                 </span>
             </div>
@@ -134,7 +134,7 @@ function OcrFileSelect({ onFileSelected }) {
                     <p className="text-lg font-bold text-gray-700">
                         이미지 또는 PDF 파일에서 텍스트 인식
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs text-gray-500">
                         이미지 또는 PDF 파일을 업로드하면 텍스트를 추출하여 수기 등록 폼에 자동 입력합니다.
                     </p>
                 </div>
@@ -156,7 +156,7 @@ function OcrFileSelect({ onFileSelected }) {
 
 function FileNoticeBox() {
     return (
-        <div className="h-full w-1/3 rounded-lg border-4 border-[#D5A548] bg-white px-6 py-5">
+        <div className="flex h-full w-1/3 flex-col rounded-lg border-4 border-primary-gold bg-white px-6 py-8">
             <h4 className="mb-5 text-[28px] font-bold text-gray-700">
                 업로드 전 확인
             </h4>
@@ -165,7 +165,7 @@ function FileNoticeBox() {
                 {UPLOAD_NOTICE.map((notice, idx) => (
                     <li key={idx} className="flex items-center gap-3">
                         <CheckIcon className="size-6" />
-                        <p className="text-lg text-gray-500">{notice}</p>
+                        <p className="text-[20px] text-gray-500">{notice}</p>
                     </li>
                 ))}
             </ul>
@@ -183,8 +183,8 @@ function RegisterResultBox({ uploadResult, onRetry }) {
     const { status, fileName, uploadedAt } = uploadResult;
 
     return (
-        <div className="my-10 rounded-lg border border-gray-100 bg-white p-7">
-            <div className="flex gap-3">
+        <div className="my-8 rounded-lg border border-gray-100 bg-white p-7">
+            <div className="flex gap-2">
                 {status === "error" && <ErrorCircleIcon className="size-6" />}
                 {status === "success" && <SuccessCircleIcon className="size-6" />}
 
@@ -201,16 +201,16 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                             {status === "success" && "업로드 성공"}
                         </p>
 
-                        <span className="text-[24px] text-gray-300">
+                        <span className="text-[20x] text-gray-300">
                             {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
                         </span>
                     </div>
 
-                    <span className="text-[24px] text-gray-300">파일명: {fileName ?? "-"}</span>
+                    <span className="text-[20px] text-gray-300">파일명: {fileName ?? "-"}</span>
 
                     {status === "error" && (
                         <div className="flex items-center justify-between">
-                            <p className="text-[24px] text-[#AD211D]">
+                            <p className="text-[20x] text-[#AD211D]">
                                 지원되지 않는 파일 형식입니다. xlsx 또는 csv 파일만 업로드
                                 가능합니다.
                             </p>
@@ -227,25 +227,25 @@ function RegisterResultBox({ uploadResult, onRetry }) {
 
                     {status === "success" && (
                         <>
-                            <div className="mt-8 rounded-lg border border-gray-100">
+                            <div className="mt-3 rounded-lg border border-gray-100">
                                 <p className="border-b border-gray-100 p-6 text-[24px] font-bold text-gray-500">
                                     파싱 결과 요약
                                 </p>
 
-                                <div className="mb-6 flex w-full items-center justify-around py-10">
-                                    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[24px]">
+                                <div className="mb-6 flex w-full items-center justify-around py-">
+                                    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>총 건수</p>
                                         <div>
                                             <span className="text-[28px] font-bold">-</span>건
                                         </div>
                                     </div>
-                                    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[24px]">
+                                    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>정상 건수</p>
                                         <div>
                                             <span className="text-[28px] font-bold text-[#1E9800]">-</span>건
                                         </div>
                                     </div>
-                                    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[24px]">
+                                    <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>예약 건수</p>
                                         <div>
                                             <span className="text-[28px] font-bold text-[#F07800]">-</span>건
@@ -254,7 +254,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                 </div>
                             </div>
 
-                            <p className="my-6 text-[24px] text-gray-500">
+                            <p className="my-3 text-[20px] text-gray-500">
                                 예외/오류 데이터는 인박스에서 확인 및 검수해주세요.
                             </p>
 
@@ -262,7 +262,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                 onClick={() => navigate("/inbox")}
                                 className="bg-primary-navy flex w-full items-center justify-center gap-4 rounded-lg py-4 transition-opacity hover:opacity-90"
                             >
-                                <span className="text-surface-100 text-[24px] font-bold">
+                                <span className="text-surface-100 text-[22px] font-bold">
                                     인박스로 이동
                                 </span>
                                 <LineArrowRightIcon />
