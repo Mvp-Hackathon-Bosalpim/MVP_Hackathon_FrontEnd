@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import OcrDocumentIcon from "@/assets/icons/ocr-document-icon.svg?react";
 import OcrScanIcon from "@/assets/icons/ocr-scan-icon.svg?react";
@@ -27,7 +27,7 @@ function formatUploadTime(date) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export default function FileUploadSection({ onGoToManualEntry }) {
+export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
     // uploadResult: null | { status: 'success' | 'error', fileName: string }
     const [uploadResult, setUploadResult] = useState(null);
 
@@ -43,10 +43,16 @@ export default function FileUploadSection({ onGoToManualEntry }) {
         }
     };
 
+    useEffect(() => {
+        if (initialFile) {
+            handleFile(initialFile);
+        }
+    }, [initialFile]);
+
     return (
         <>
             <div>
-                <h4 className="mb-4 text-[28px] font-bold text-gray-700">
+                <h4 className="mb-5 text-[28px] font-bold text-gray-700">
                     1. 파일 업로드
                 </h4>
                 <div className="flex items-stretch gap-4">
@@ -193,8 +199,8 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                         <p
                             className={cn(
                                 "text-[28px] font-bold",
-                                status === "error" && "text-[#AD211D]",
-                                status === "success" && "text-[#74996B]",
+                                status === "error" && "text-state-error",
+                                status === "success" && "text-state-success",
                             )}
                         >
                             {status === "error" && "업로드 실패"}
@@ -210,7 +216,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
 
                     {status === "error" && (
                         <div className="flex items-center justify-between">
-                            <p className="text-[20x] text-[#AD211D]">
+                            <p className="text-[20x] text-state-error">
                                 지원되지 않는 파일 형식입니다. xlsx 또는 csv 파일만 업로드
                                 가능합니다.
                             </p>
@@ -242,13 +248,13 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>정상 건수</p>
                                         <div>
-                                            <span className="text-[28px] font-bold text-[#1E9800]">-</span>건
+                                            <span className="text-[28px] font-bold text-state-success">-</span>건
                                         </div>
                                     </div>
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>예약 건수</p>
                                         <div>
-                                            <span className="text-[28px] font-bold text-[#F07800]">-</span>건
+                                            <span className="text-[28px] font-bold text-state-warning">-</span>건
                                         </div>
                                     </div>
                                 </div>

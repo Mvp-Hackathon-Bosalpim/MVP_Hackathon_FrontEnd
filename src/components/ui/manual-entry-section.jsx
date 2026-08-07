@@ -8,7 +8,7 @@ const TABLE_HEADERS = [
     "공급사",
     "품목명",
     "단가 (원)",
-    "규격",
+    "규격/단위",
     "수량",
     "공급가액 (원)",
     "부가세 (원)",
@@ -21,12 +21,12 @@ const EMPTY_ROW = {
     공급사: "",
     품목명: "",
     단가: "",
-    규격: "",
+    규격단위: "",
     수량: "",
     공급일자: "",
     비고: "",
 };
-const REQUIRED_FIELDS = ["공급사", "품목명", "단가", "규격", "수량", "공급일자"];
+const REQUIRED_FIELDS = ["공급사", "품목명", "단가", "규격단위", "수량", "공급일자"];
 
 function isRowComplete(row) {
     return REQUIRED_FIELDS.every((field) => String(row[field] ?? "").trim() !== "");
@@ -70,19 +70,21 @@ function ManualEntrySection() {
     const getVat = (row) => Math.round(getSupplyAmount(row) * 0.1);
 
     return (
-        <div className="my-10">
-            <div className="mb-5 flex items-center justify-between">
-                <h4 className="text-[28px] font-bold text-gray-700">
-                    2. 수기 등록 (파일이 없을 경우 직접 입력하세요)
-                </h4>
-                <button
-                    onClick={addRow}
-                    className="bg-primary-navy rounded-sm px-4 py-2 text-[20px] text-white"
-                >
-                    + 행 추가
-                </button>
+        <div className="mb-2">
+            <div className="mb-3 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                    <h4 className="text-[28px] font-bold text-gray-700">
+                        2. 수기 등록 (파일이 없을 경우 직접 입력하세요)
+                    </h4>
+                    <button
+                        onClick={addRow}
+                        className="bg-primary-navy rounded-sm px-4 py-2 text-[20px] text-white"
+                    >
+                        + 행 추가
+                    </button>
+                </div>
                 {submitAttempted && incompleteIndexes.size > 0 && (
-                    <p className="mb-2 text-[18px] text-[#AD211D]">
+                    <p className="text-[18px] text-state-error">
                         확인 필요: 필수 항목이 비어 있는 행이 있습니다. 붉은 테두리로 표시된 항목을 채워주세요.
                     </p>
                 )}
@@ -134,10 +136,10 @@ function ManualEntrySection() {
                                 </td>
                                 <td className="px-2 py-3">
                                     <TableInput
-                                        value={row.규격}
-                                        placeholder="규격 입력"
-                                        onChange={(v) => updateRow(idx, "규격", v)}
-                                        hasError={submitAttempted && !row.규격?.trim()}
+                                        value={row.규격단위}
+                                        placeholder="규격/단위 입력"
+                                        onChange={(v) => updateRow(idx, "규격단위", v)}
+                                        hasError={submitAttempted && !row.규격단위?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -217,7 +219,7 @@ function TableInput({ value, placeholder, type = "text", onChange, hasError = fa
             onChange={(e) => onChange(e.target.value)}
             className={cn(
                 "w-full rounded border px-2 py-1 text-center text-gray-500 placeholder-gray-500 outline-none",
-                hasError ? "border-[#AD211D] bg-white" : "bg-surface-100 border-gray-100",
+                hasError ? "border-state-error bg-white" : "bg-surface-100 border-gray-100",
             )}
         />
     );
