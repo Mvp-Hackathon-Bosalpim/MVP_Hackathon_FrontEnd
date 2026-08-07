@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import DownloadIcon from "@/assets/icons/download-icon.svg?react";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
@@ -14,7 +14,7 @@ const TABS = [
 
 function RegisterPage() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState("upload");
+  const [activeTab, setActiveTab] = useState(location.state?.defaultTab ?? "upload");
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
