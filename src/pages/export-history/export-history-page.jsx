@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ExportHistoryIcon from "@/assets/icons/export-history-icon.svg?react";
 import ExportHistoryFilterBar from "@/components/ui/export-history-filter-bar";
 import ExportFileTable from "@/components/ui/export-file-table";
-import Pagination from "@/components/ui/pagination";
+import Pagination from "@/components/ui/export-pagination";
 
 // 마크업 단계: 실제 API 연동 전까지 더미 템플릿을 반복해 목데이터 생성
 const EXPORT_FILE_TEMPLATES = [
