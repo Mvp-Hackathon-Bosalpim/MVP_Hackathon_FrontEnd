@@ -7,26 +7,24 @@ import { cn } from "@/lib/utils";
 const TABLE_HEADERS = [
     "공급사",
     "품목명",
-    "단가 (원)",
-    "규격/단위",
-    "수량",
-    "공급가액 (원)",
-    "부가세 (원)",
-    "공급일자",
-    "비고",
+    "규격",
+    "단위",
+    "변경 전 단가",
+    "변경 후 단가",
+    "적용일",
     "삭제",
 ];
 
 const EMPTY_ROW = {
     공급사: "",
     품목명: "",
-    단가: "",
-    규격단위: "",
-    수량: "",
-    공급일자: "",
-    비고: "",
+    규격: "",
+    단위: "",
+    변경전단가: "",
+    변경후단가: "",
+    적용일: "",
 };
-const REQUIRED_FIELDS = ["공급사", "품목명", "단가", "규격단위", "수량", "공급일자"];
+const REQUIRED_FIELDS = ["공급사", "품목명", "규격", "단위", "변경전단가", "변경후단가", "적용일"];
 
 function isRowComplete(row) {
     return REQUIRED_FIELDS.every((field) => String(row[field] ?? "").trim() !== "");
@@ -63,11 +61,6 @@ function ManualEntrySection() {
         setRows([{ ...EMPTY_ROW }, { ...EMPTY_ROW }]);
         setSubmitAttempted(false);
     };
-
-    const getSupplyAmount = (row) =>
-        (parseFloat(row.단가) || 0) * (parseFloat(row.수량) || 0);
-
-    const getVat = (row) => Math.round(getSupplyAmount(row) * 0.1);
 
     return (
         <div className="mb-2">
@@ -128,55 +121,42 @@ function ManualEntrySection() {
                                 </td>
                                 <td className="px-2 py-3">
                                     <TableInput
-                                        value={row.단가}
+                                        value={row.규격}
+                                        placeholder="규격 입력"
+                                        onChange={(v) => updateRow(idx, "규격", v)}
+                                        hasError={submitAttempted && !row.규격?.trim()}
+                                    />
+                                </td>
+                                <td className="px-2 py-3">
+                                    <TableInput
+                                        value={row.단위}
+                                        placeholder="단위 입력"
+                                        onChange={(v) => updateRow(idx, "단위", v)}
+                                        hasError={submitAttempted && !row.단위?.trim()}
+                                    />
+                                </td>
+                                <td className="px-2 py-3">
+                                    <TableInput
+                                        value={row.변경전단가}
                                         placeholder="숫자만 입력"
-                                        onChange={(v) => updateRow(idx, "단가", v)}
-                                        hasError={submitAttempted && !row.단가?.trim()}
+                                        onChange={(v) => updateRow(idx, "변경전단가", v)}
+                                        hasError={submitAttempted && !row.변경전단가?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
                                     <TableInput
-                                        value={row.규격단위}
-                                        placeholder="규격/단위 입력"
-                                        onChange={(v) => updateRow(idx, "규격단위", v)}
-                                        hasError={submitAttempted && !row.규격단위?.trim()}
-                                    />
-                                </td>
-                                <td className="px-2 py-3">
-                                    <TableInput
-                                        value={row.수량}
+                                        value={row.변경후단가}
                                         placeholder="숫자만 입력"
-                                        onChange={(v) => updateRow(idx, "수량", v)}
-                                        hasError={submitAttempted && !row.수량?.trim()}
-                                    />
-                                </td>
-                                <td className="px-2 py-3">
-                                    <input
-                                        readOnly
-                                        value={getSupplyAmount(row).toLocaleString()}
-                                        className="bg-surface-200 w-full rounded border border-gray-100 px-2 py-1 text-center text-gray-500 outline-none"
-                                    />
-                                </td>
-                                <td className="px-2 py-3">
-                                    <input
-                                        readOnly
-                                        value={getVat(row).toLocaleString()}
-                                        className="bg-surface-200 w-full rounded border border-gray-100 px-2 py-1 text-center text-gray-500 outline-none"
+                                        onChange={(v) => updateRow(idx, "변경후단가", v)}
+                                        hasError={submitAttempted && !row.변경후단가?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
                                     <TableInput
-                                        value={row.공급일자}
+                                        value={row.적용일}
                                         placeholder="YYYY-MM-DD"
-                                        onChange={(v) => updateRow(idx, "공급일자", formatDateInput(v))}
-                                        hasError={submitAttempted && !row.공급일자?.trim()}
-                                    />
-                                </td>
-                                <td className="px-2 py-3">
-                                    <TableInput
-                                        value={row.비고}
-                                        placeholder="비고 입력"
-                                        onChange={(v) => updateRow(idx, "비고", v)}
+                                        onChange={(v) => updateRow(idx, "적용일", formatDateInput(v))}
+                                        hasError={submitAttempted && !row.적용일?.trim()}
                                     />
                                 </td>
                                 <td className="px-6 py-3 text-center">
