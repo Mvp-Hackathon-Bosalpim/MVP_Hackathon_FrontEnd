@@ -13,16 +13,16 @@ import UploadIcon from "@/assets/icons/upload-icon.svg?react";
 
 const OVERVIEW_STATS = [
   { icon: FileText, label: "전체 건수", unit: "건" },
-  { icon: Clock, label: "검수 대기", unit: "건" },
-  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
   { icon: SuccessCircleIcon, label: "승인 완료", unit: "건" },
+  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
+  { icon: Clock, label: "검수 대기", unit: "건" },
 ];
 
 const PRODUCTIVITY_STATS = [
   { icon: LineChart, label: "전체 건수", unit: "건" },
-  { icon: Clock, label: "평균 검수 시간", unit: "" },
-  { icon: AlertTriangle, label: "오류 발생률", unit: "%", iconColor: "text-primary-gold" },
-  { icon: SuccessCircleIcon, label: "품질/정확도", unit: "%" },
+  { icon: SuccessCircleIcon, label: "승인 완료", unit: "건" },
+  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
+  { icon: Clock, label: "검수 대기", unit: "건" },
 ];
 
 const PRIORITY_ITEMS = [
