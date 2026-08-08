@@ -9,7 +9,14 @@ import RegisterPage from "./pages/register-page";
 import InboxPage from "./pages/inbox/inbox-page";
 import InboxDetailPage from "./pages/inbox/inbox-detail-page";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+      gcTime: Infinity,
+    },
+  },
+});
 
 const router = createBrowserRouter([
   {
