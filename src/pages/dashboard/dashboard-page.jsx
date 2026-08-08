@@ -6,7 +6,7 @@ import {
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import StatCard from "../../components/ui/stat-card";
 import QuickActionButton from "../../components/ui/quick-action-button";
-import PriorityReviewItem from "../../components/ui/priority-review-item";
+import PriorityIssueBarChart from "../../components/ui/priority-issue-bar-chart";
 import ExportHistoryTable from "../../components/ui/export-history-table";
 import { useNavigate } from "react-router-dom";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
@@ -25,11 +25,14 @@ const PRODUCTIVITY_STATS = [
   { icon: Clock, label: "검수 대기", unit: "건" },
 ];
 
-const PRIORITY_ITEMS = [
-  { order: 1, type: "missing", title: "누락 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "high" },
-  { order: 2, type: "duplicate", title: "중복 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "medium" },
-  { order: 3, type: "mismatch", title: "불일치 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "low" },
+const PRIORITY_ISSUES = [
+  { issue_type: "missing_required", label: "누락 데이터", count: 45, color: "state-error" },
+  { issue_type: "duplicate_suspected", label: "중복 의심", count: 30, color: "state-warning" },
+  { issue_type: "spec_mismatch", label: "규격 불일치", count: 28, color: "state-gold" },
+  { issue_type: "unit_mismatch", label: "단위 불일치", count: 20, color: "issue-unit" },
 ];
+const TOTAL_ERROR_COUNT = PRIORITY_ISSUES.reduce((sum, issue) => sum + issue.count, 0);
+const TOTAL_DATA_COUNT = 1000;
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -77,11 +80,11 @@ export default function DashboardPage() {
               전체보기 <ChevronRight size={16} />
             </button>
           </div>
-          <div className="flex-1 flex flex-col justify-evenly divide-y divide-surface-200 px-4">
-            {PRIORITY_ITEMS.map((item) => (
-              <PriorityReviewItem key={item.order} {...item} />
-            ))}
-          </div>
+          <PriorityIssueBarChart
+            issues={PRIORITY_ISSUES}
+            totalErrorCount={TOTAL_ERROR_COUNT}
+            totalDataCount={TOTAL_DATA_COUNT}
+          />
         </div>
       </section>
       {/* 4. 최근 데이터 내보내기 이력 */}

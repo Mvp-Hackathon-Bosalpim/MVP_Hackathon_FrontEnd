@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import MainLayout from "./components/layout/main-layout";
 import DashboardPage from "./pages/dashboard/dashboard-page";
+import ExportHistoryPage from "./pages/export-history/export-history-page";
 import NotFoundPage from "./pages/not-found-page";
 import RegisterPage from "./pages/register-page";
 import InboxPage from "./pages/inbox/inbox-page";
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <DashboardPage /> },
       { path: "/register", element: <RegisterPage /> },
+      { path: "/export-history", element: <ExportHistoryPage /> },
       { path: "/inbox", element: <InboxPage /> },
       { path: "/inbox/:docId", element: <InboxDetailPage /> },
     ],
