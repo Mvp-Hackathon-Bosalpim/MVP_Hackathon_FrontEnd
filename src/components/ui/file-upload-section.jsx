@@ -8,6 +8,7 @@ import ErrorCircleIcon from "@/assets/icons/error-circle-icon.svg?react";
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import { cn } from "@/lib/utils";
+import { uploadDocument } from "@/services/api/document";
 
 const UPLOAD_NOTICE = [
     "원본 행 번호와 파일명을 자동으로 함께 저장합니다.",
@@ -30,16 +31,27 @@ function formatUploadTime(date) {
 export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
     // uploadResult: null | { status: 'success' | 'error', fileName: string }
     const [uploadResult, setUploadResult] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
 
-    const handleFile = (file) => {
-        if (!file) return;
+    const handleFile = async (file) => {
+        if (!file || isUploading) return;
         const ext = getExtension(file.name);
         const uploadedAt = new Date();
 
-        if (ALLOWED_EXTENSIONS.includes(ext)) {
-            setUploadResult({ status: "success", fileName: file.name, uploadedAt });
-        } else {
-            setUploadResult({ status: "error", fileName: file.name, uploadedAt });
+        if (!ALLOWED_EXTENSIONS.includes(ext)) {
+            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: "지원되지 않는 파일 형식입니다. xlsx 또는 csv 파일만 업로드 가능합니다." });
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const res = await uploadDocument(file);
+            const { total, normal, need_checked } = res.data;
+            setUploadResult({ status: "success", fileName: file.name, uploadedAt, total, normal, needChecked: need_checked });
+        } catch (err) {
+            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? "업로드에 실패했습니다." });
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -56,7 +68,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
                     1. 파일 업로드
                 </h4>
                 <div className="flex items-stretch gap-4">
-                    <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} />
+                    <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} isUploading={isUploading} />
                     <FileNoticeBox />
                 </div>
             </div>
@@ -66,7 +78,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
     );
 }
 
-function FileUploader({ onFileSelected, onGoToManualEntry }) {
+function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
     const [isDragging, setIsDragging] = useState(false);
 
     const handleDragOver = (e) => {
@@ -110,13 +122,24 @@ function FileUploader({ onFileSelected, onGoToManualEntry }) {
             >
                 <UploadIcon />
                 <p className="text-[28px] font-bold text-gray-700">
-                    XLSX 또는 CSV 파일을 이곳에 드래그하세요
+                    {isUploading ? "업로드 중..." : "XLSX 또는 CSV 파일을 이곳에 드래그하세요"}
                 </p>
                 <span className="my-1 block text-[20px] text-gray-300">또는</span>
 
-                <label className="rounded-sm border-2 border-gray-100 px-4 py-1.5 text-[22px] text-gray-500">
+                <label
+                    className={cn(
+                        "rounded-sm border-2 border-gray-100 px-4 py-1.5 text-[22px] text-gray-500",
+                        isUploading && "pointer-events-none opacity-50",
+                    )}
+                >
                     파일 선택
-                    <input type="file" accept=".xlsx,.csv" className="hidden" onChange={handleInputChange} />
+                    <input
+                        type="file"
+                        accept=".xlsx,.csv"
+                        className="hidden"
+                        onChange={handleInputChange}
+                        disabled={isUploading}
+                    />
                 </label>
 
                 <span className="text-[20px] text-gray-300">
@@ -186,7 +209,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
         return null;
     }
 
-    const { status, fileName, uploadedAt } = uploadResult;
+    const { status, fileName, uploadedAt, total, normal, needChecked, errorMessage } = uploadResult;
 
     return (
         <div className="my-8 rounded-lg border border-gray-100 bg-white p-7">
@@ -216,10 +239,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
 
                     {status === "error" && (
                         <div className="flex items-center justify-between">
-                            <p className="text-[20x] text-state-error">
-                                지원되지 않는 파일 형식입니다. xlsx 또는 csv 파일만 업로드
-                                가능합니다.
-                            </p>
+                            <p className="text-[20x] text-state-error">{errorMessage ?? "-"}</p>
 
                             <button
                                 type="button"
@@ -242,19 +262,19 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>총 건수</p>
                                         <div>
-                                            <span className="text-[28px] font-bold">-</span>건
+                                            <span className="text-[28px] font-bold">{total ?? "-"}</span>건
                                         </div>
                                     </div>
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>정상 건수</p>
                                         <div>
-                                            <span className="text-[28px] font-bold text-state-success">-</span>건
+                                            <span className="text-[28px] font-bold text-state-success">{normal ?? "-"}</span>건
                                         </div>
                                     </div>
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
                                         <p>예약 건수</p>
                                         <div>
-                                            <span className="text-[28px] font-bold text-state-warning">-</span>건
+                                            <span className="text-[28px] font-bold text-state-warning">{needChecked ?? "-"}</span>건
                                         </div>
                                     </div>
                                 </div>
