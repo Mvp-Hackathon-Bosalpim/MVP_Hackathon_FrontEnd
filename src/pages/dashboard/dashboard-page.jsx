@@ -6,30 +6,33 @@ import {
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import StatCard from "../../components/ui/stat-card";
 import QuickActionButton from "../../components/ui/quick-action-button";
-import PriorityReviewItem from "../../components/ui/priority-review-item";
+import PriorityIssueBarChart from "../../components/ui/priority-issue-bar-chart";
 import ExportHistoryTable from "../../components/ui/export-history-table";
 import { useNavigate } from "react-router-dom";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
 
 const OVERVIEW_STATS = [
   { icon: FileText, label: "전체 건수", unit: "건" },
-  { icon: Clock, label: "검수 대기", unit: "건" },
-  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
   { icon: SuccessCircleIcon, label: "승인 완료", unit: "건" },
+  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
+  { icon: Clock, label: "검수 대기", unit: "건" },
 ];
 
 const PRODUCTIVITY_STATS = [
   { icon: LineChart, label: "전체 건수", unit: "건" },
-  { icon: Clock, label: "평균 검수 시간", unit: "" },
-  { icon: AlertTriangle, label: "오류 발생률", unit: "%", iconColor: "text-primary-gold" },
-  { icon: SuccessCircleIcon, label: "품질/정확도", unit: "%" },
+  { icon: SuccessCircleIcon, label: "승인 완료", unit: "건" },
+  { icon: AlertTriangle, label: "예외/오류 탐지", unit: "건", iconColor: "text-primary-gold" },
+  { icon: Clock, label: "검수 대기", unit: "건" },
 ];
 
-const PRIORITY_ITEMS = [
-  { order: 1, type: "missing", title: "누락 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "high" },
-  { order: 2, type: "duplicate", title: "중복 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "medium" },
-  { order: 3, type: "mismatch", title: "불일치 데이터 탐지", occurredAt: "2026-00-00 00:00", severity: "low" },
+const PRIORITY_ISSUES = [
+  { issue_type: "missing_required", label: "누락 데이터", count: 45, color: "state-error" },
+  { issue_type: "duplicate_suspected", label: "중복 의심", count: 30, color: "state-warning" },
+  { issue_type: "spec_mismatch", label: "규격 불일치", count: 28, color: "state-gold" },
+  { issue_type: "unit_mismatch", label: "단위 불일치", count: 20, color: "issue-unit" },
 ];
+const TOTAL_ERROR_COUNT = PRIORITY_ISSUES.reduce((sum, issue) => sum + issue.count, 0);
+const TOTAL_DATA_COUNT = 1000;
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -77,18 +80,21 @@ export default function DashboardPage() {
               전체보기 <ChevronRight size={16} />
             </button>
           </div>
-          <div className="flex-1 flex flex-col justify-evenly divide-y divide-surface-200 px-4">
-            {PRIORITY_ITEMS.map((item) => (
-              <PriorityReviewItem key={item.order} {...item} />
-            ))}
-          </div>
+          <PriorityIssueBarChart
+            issues={PRIORITY_ISSUES}
+            totalErrorCount={TOTAL_ERROR_COUNT}
+            totalDataCount={TOTAL_DATA_COUNT}
+          />
         </div>
       </section>
       {/* 4. 최근 데이터 내보내기 이력 */}
       <section className="bg-surface-0 border border-surface-200 rounded-lg overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-surface-300 ">
           <h2 className="text-lg font-bold text-gray-700">최근 데이터 내보내기 이력</h2>
-          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+          <button
+            onClick={() => navigate("/export-history")}
+            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          >
             전체보기 <ChevronRight size={16} />
           </button>
         </div>
