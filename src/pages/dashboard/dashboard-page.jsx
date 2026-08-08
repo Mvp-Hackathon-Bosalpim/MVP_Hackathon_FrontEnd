@@ -91,7 +91,10 @@ export default function DashboardPage() {
       <section className="bg-surface-0 border border-surface-200 rounded-lg overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-surface-300 ">
           <h2 className="text-lg font-bold text-gray-700">최근 데이터 내보내기 이력</h2>
-          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+          <button
+            onClick={() => navigate("/export-history")}
+            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          >
             전체보기 <ChevronRight size={16} />
           </button>
         </div>
