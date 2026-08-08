@@ -25,10 +25,10 @@ const EMPTY_ROW = {
     변경후단가: "",
     적용일: "",
 };
-const REQUIRED_FIELDS = ["공급사", "품목명", "규격", "단위", "변경전단가", "변경후단가", "적용일"];
+const ROW_FIELDS = ["공급사", "품목명", "규격", "단위", "변경전단가", "변경후단가", "적용일"];
 
-function isRowComplete(row) {
-    return REQUIRED_FIELDS.every((field) => String(row[field] ?? "").trim() !== "");
+function isRowEmpty(row) {
+    return ROW_FIELDS.every((field) => String(row[field] ?? "").trim() === "");
 }
 
 function ManualEntrySection() {
@@ -39,15 +39,15 @@ function ManualEntrySection() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
 
-    const incompleteIndexes = rows.reduce((acc, row, idx) => {
-        if (!isRowComplete(row)) acc.add(idx);
+    const emptyIndexes = rows.reduce((acc, row, idx) => {
+        if (isRowEmpty(row)) acc.add(idx);
         return acc;
     }, new Set());
 
     const handleSubmit = async () => {
         setSubmitAttempted(true);
         setSubmitError(null);
-        if (incompleteIndexes.size > 0) return;
+        if (emptyIndexes.size > 0) return;
 
         const items = rows.map((row) => ({
             spec: row.규격,
@@ -99,9 +99,9 @@ function ManualEntrySection() {
                         + 행 추가
                     </button>
                 </div>
-                {submitAttempted && incompleteIndexes.size > 0 && (
+                {submitAttempted && emptyIndexes.size > 0 && (
                     <p className="text-[18px] text-state-error">
-                        확인 필요: 필수 항목이 비어 있는 행이 있습니다. 붉은 테두리로 표시된 항목을 채워주세요.
+                        빈 행이 있습니다. 삭제 후 등록해주세요.
                     </p>
                 )}
                 {submitError && (
@@ -126,7 +126,13 @@ function ManualEntrySection() {
                     </thead>
                     <tbody>
                         {rows.map((row, idx) => (
-                            <tr key={idx} className="border-b border-gray-100 last:border-0">
+                            <tr
+                                key={idx}
+                                className={cn(
+                                    "border-b border-gray-100 last:border-0",
+                                    submitAttempted && emptyIndexes.has(idx) && "bg-white outline outline-state-error -outline-offset-1",
+                                )}
+                            >
                                 <td className="py-4 text-center text-gray-500">{idx + 1}</td>
 
                                 <td className="px-2 py-3">
@@ -134,7 +140,6 @@ function ManualEntrySection() {
                                         value={row.공급사}
                                         placeholder="공급사 입력"
                                         onChange={(v) => updateRow(idx, "공급사", v)}
-                                        hasError={submitAttempted && !row.공급사?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -142,7 +147,6 @@ function ManualEntrySection() {
                                         value={row.품목명}
                                         placeholder="품목명 입력"
                                         onChange={(v) => updateRow(idx, "품목명", v)}
-                                        hasError={submitAttempted && !row.품목명?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -150,7 +154,6 @@ function ManualEntrySection() {
                                         value={row.규격}
                                         placeholder="규격 입력"
                                         onChange={(v) => updateRow(idx, "규격", v)}
-                                        hasError={submitAttempted && !row.규격?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -158,7 +161,6 @@ function ManualEntrySection() {
                                         value={row.단위}
                                         placeholder="단위 입력"
                                         onChange={(v) => updateRow(idx, "단위", v)}
-                                        hasError={submitAttempted && !row.단위?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -166,7 +168,6 @@ function ManualEntrySection() {
                                         value={row.변경전단가}
                                         placeholder="숫자만 입력"
                                         onChange={(v) => updateRow(idx, "변경전단가", v)}
-                                        hasError={submitAttempted && !row.변경전단가?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -174,7 +175,6 @@ function ManualEntrySection() {
                                         value={row.변경후단가}
                                         placeholder="숫자만 입력"
                                         onChange={(v) => updateRow(idx, "변경후단가", v)}
-                                        hasError={submitAttempted && !row.변경후단가?.trim()}
                                     />
                                 </td>
                                 <td className="px-2 py-3">
@@ -182,7 +182,6 @@ function ManualEntrySection() {
                                         value={row.적용일}
                                         placeholder="YYYY-MM-DD"
                                         onChange={(v) => updateRow(idx, "적용일", formatDateInput(v))}
-                                        hasError={submitAttempted && !row.적용일?.trim()}
                                     />
                                 </td>
                                 <td className="px-6 py-3 text-center">
@@ -218,17 +217,14 @@ function ManualEntrySection() {
     );
 }
 
-function TableInput({ value, placeholder, type = "text", onChange, hasError = false }) {
+function TableInput({ value, placeholder, type = "text", onChange }) {
     return (
         <input
             type={type}
             value={value}
             placeholder={placeholder}
             onChange={(e) => onChange(e.target.value)}
-            className={cn(
-                "w-full rounded border px-2 py-1 text-center text-gray-500 placeholder-gray-500 outline-none",
-                hasError ? "border-state-error bg-white" : "bg-surface-100 border-gray-100",
-            )}
+            className="bg-surface-100 border-gray-100 w-full rounded border px-2 py-1 text-center text-gray-500 placeholder-gray-500 outline-none"
         />
     );
 }

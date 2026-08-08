@@ -18,7 +18,11 @@ export const uploadDocument = (file) => {
   // Content-Type은 axios/브라우저가 FormData를 보고 boundary까지 채워 자동 설정하도록 비워둠
   // (직접 지정하거나 undefined로 덮으면 boundary가 빠져 요청이 깨짐)
   return client
-    .post("/api/v1/document", formData, { headers: { accept: "*/*" } })
+    .post("/api/v1/document", formData, {
+      headers: {
+        accept: "*/*", "Content-Type": undefined,
+      }
+    })
     .then((res) => res.data);
 };
 
