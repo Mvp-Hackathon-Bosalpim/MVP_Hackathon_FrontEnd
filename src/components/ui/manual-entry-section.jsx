@@ -3,6 +3,7 @@ import { useState } from "react";
 import TrashIcon from "@/assets/icons/trash-icon.svg?react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { createManualDocument } from "@/services/api/document";
 
 const TABLE_HEADERS = [
     "공급사",
@@ -35,16 +36,38 @@ function ManualEntrySection() {
     const [rows, setRows] = useState([{ ...EMPTY_ROW }, { ...EMPTY_ROW }]);
 
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
 
     const incompleteIndexes = rows.reduce((acc, row, idx) => {
         if (!isRowComplete(row)) acc.add(idx);
         return acc;
     }, new Set());
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setSubmitAttempted(true);
+        setSubmitError(null);
         if (incompleteIndexes.size > 0) return;
-        navigate("/inbox");
+
+        const items = rows.map((row) => ({
+            spec: row.규격,
+            unit: row.단위,
+            supplier_name: row.공급사,
+            raw_item_name: row.품목명,
+            price_before: Number(row.변경전단가),
+            price_after: Number(row.변경후단가),
+            effective_date: row.적용일,
+        }));
+
+        setIsSubmitting(true);
+        try {
+            await createManualDocument(items);
+            navigate("/inbox");
+        } catch (err) {
+            setSubmitError(err.response?.data?.message ?? "등록에 실패했습니다.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const addRow = () => setRows((prev) => [...prev, { ...EMPTY_ROW }]);
@@ -80,6 +103,9 @@ function ManualEntrySection() {
                     <p className="text-[18px] text-state-error">
                         확인 필요: 필수 항목이 비어 있는 행이 있습니다. 붉은 테두리로 표시된 항목을 채워주세요.
                     </p>
+                )}
+                {submitError && (
+                    <p className="text-[18px] text-state-error">{submitError}</p>
                 )}
             </div>
 
@@ -175,15 +201,17 @@ function ManualEntrySection() {
             <div className="flex justify-end gap-3 py-4">
                 <button
                     onClick={reset}
-                    className="hover:bg-surface-100 rounded-sm border border-gray-100 px-6 py-2 text-[20px] text-gray-500 transition-colors"
+                    disabled={isSubmitting}
+                    className="hover:bg-surface-100 rounded-sm border border-gray-100 px-6 py-2 text-[20px] text-gray-500 transition-colors disabled:opacity-50"
                 >
                     초기화
                 </button>
                 <button
                     onClick={handleSubmit}
-                    className="bg-primary-navy rounded-sm px-6 py-2 text-[20px] text-white transition-opacity hover:opacity-90"
+                    disabled={isSubmitting}
+                    className="bg-primary-navy rounded-sm px-6 py-2 text-[20px] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                    등록하기
+                    {isSubmitting ? "등록 중..." : "등록하기"}
                 </button>
             </div>
         </div>
