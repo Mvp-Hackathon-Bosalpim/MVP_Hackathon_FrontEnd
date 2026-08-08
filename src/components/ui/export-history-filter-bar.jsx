@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Search, ChevronDown, RotateCcw } from "lucide-react";
 import ExportDateRangePicker from "./export-date-range-picker";
 
-const FORMAT_OPTIONS = ["JSON", "CSV"];
+const FORMAT_OPTIONS = ["전체", "JSON", "CSV"];
 
 export default function ExportHistoryFilterBar({
   fileName,
@@ -53,10 +53,12 @@ export default function ExportHistoryFilterBar({
                 key={option}
                 type="button"
                 onClick={() => {
-                  onFormatChange(selectedFormat === option ? null : option);
+                  onFormatChange(option === "전체" ? null : option);
                   setIsFormatOpen(false);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-surface-100 ${selectedFormat === option ? "font-semibold text-primary-navy" : "text-gray-500"
+                className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-surface-100 ${(option === "전체" && !selectedFormat) || selectedFormat === option
+                  ? "font-semibold text-primary-navy"
+                  : "text-gray-500"
                   }`}
               >
                 {option}
