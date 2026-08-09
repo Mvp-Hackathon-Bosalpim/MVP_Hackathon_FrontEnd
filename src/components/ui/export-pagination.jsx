@@ -4,6 +4,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const PAGE_SET_SIZE = 5;
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
@@ -16,6 +17,7 @@ export default function Pagination({
   onPageSizeChange,
   leftSlot,
 }) {
+  const { t } = useTranslation();
   const setStart =
     Math.floor((currentPage - 1) / PAGE_SET_SIZE) * PAGE_SET_SIZE + 1;
   const setEnd = Math.min(setStart + PAGE_SET_SIZE - 1, totalPages);
@@ -99,7 +101,7 @@ export default function Pagination({
         >
           {PAGE_SIZE_OPTIONS.map((size) => (
             <option key={size} value={size}>
-              {size}개씩 보기
+              {t("common.view_per_page", { count: size })}
             </option>
           ))}
         </select>

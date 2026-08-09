@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+import { useTranslation } from "react-i18next";
 
 // 일시 미선택 상태(현재 연도 기준)
 const currentYear = new Date().getFullYear();
@@ -63,6 +62,16 @@ function buildCalendarWeeks(year, month) {
 }
 
 export default function ExportDateRangePicker({ range, onRangeChange }) {
+  const { t } = useTranslation();
+  const WEEKDAYS = [
+    t("datepicker.sun"),
+    t("datepicker.mon"),
+    t("datepicker.tue"),
+    t("datepicker.wed"),
+    t("datepicker.thu"),
+    t("datepicker.fri"),
+    t("datepicker.sat"),
+  ];
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState({
     year: today.getFullYear(),
@@ -153,7 +162,7 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
   const dayDiff = getDayDiff(draftRange.start, draftRange.end);
 
   const label = range?.start
-    ? `${formatDate(range.start)} ~ ${range.end ? formatDate(range.end) : "종료일 선택"}`
+    ? `${formatDate(range.start)} ~ ${range.end ? formatDate(range.end) : t("datepicker.select_end_date")}`
     : UNSELECTED_LABEL;
 
   return (
@@ -181,7 +190,10 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
                   <ChevronLeft size={16} />
                 </button>
                 <span className="text-sm font-semibold text-gray-700">
-                  {view.year}년 {view.month + 1}월
+                  {t("datepicker.year_month", {
+                    year: view.year,
+                    month: String(view.month + 1).padStart(2, "0"),
+                  })}
                 </span>
                 <button
                   type="button"
@@ -251,10 +263,10 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
             {/* 오른쪽: 선택한 기간 요약 (입력 가능) */}
             <div className="w-[240px] p-4">
               <p className="mb-4 text-sm font-semibold text-gray-700">
-                선택한 기간
+                {t("datepicker.selected_period")}
               </p>
 
-              <label className="mb-1 block text-xs text-gray-500">시작일</label>
+              <label className="mb-1 block text-xs text-gray-500">{t("datepicker.start_date")}</label>
               <div className="mb-4 flex items-center gap-2 rounded border border-gray-100 px-3 py-2">
                 <input
                   type="text"
@@ -266,7 +278,7 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
                 <CalendarDays size={14} className="shrink-0 text-gray-300" />
               </div>
 
-              <label className="mb-1 block text-xs text-gray-500">종료일</label>
+              <label className="mb-1 block text-xs text-gray-500">{t("datepicker.end_date")}</label>
               <div className="mb-4 flex items-center gap-2 rounded border border-gray-100 px-3 py-2">
                 <input
                   type="text"
@@ -279,9 +291,9 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
               </div>
 
               <div className="border-t border-gray-100 pt-3">
-                <p className="mb-1 text-xs text-gray-500">기간</p>
+                <p className="mb-1 text-xs text-gray-500">{t("datepicker.duration")}</p>
                 <p className="text-sm text-gray-700">
-                  {dayDiff ? `${dayDiff}일` : "-"}
+                  {dayDiff ? t("datepicker.day_count", { count: dayDiff }) : "-"}
                 </p>
               </div>
             </div>
@@ -294,14 +306,14 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
               onClick={handleReset}
               className="hover:bg-surface-100 flex-1 rounded border border-gray-100 py-2 text-sm text-gray-500 transition-colors"
             >
-              초기화
+              {t("common.reset")}
             </button>
             <button
               type="button"
               onClick={handleApply}
               className="bg-primary-navy flex-1 rounded py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
-              적용
+              {t("common.apply")}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -7,30 +8,6 @@ import {
 } from "@/components/ui/dialog";
 
 const MAX_MEMO_LENGTH = 500;
-
-const MODAL_CONFIG = {
-  approve: {
-    title: "승인 확인",
-    hasMemo: true,
-    description: "승인 사유를 입력해주세요. (500자)",
-    placeholder: "승인 사유를 입력해주세요.",
-    confirmLabel: "승인",
-  },
-  reject: {
-    title: "반려 사유 입력",
-    hasMemo: true,
-    confirmLabel: "반려",
-    description: "반려 사유를 입력해주세요. (500자)",
-    placeholder: "반려 사유를 입력해주세요.",
-  },
-  reReview: {
-    title: "재검토 사유 입력",
-    hasMemo: true,
-    confirmLabel: "재검토",
-    description: "재검토 사유를 입력해주세요. (500자)",
-    placeholder: "재검토 사유를 입력해주세요.",
-  },
-};
 
 /**
  * @typedef {'approve' | 'reject' | 'reReview'} ActionType
@@ -49,7 +26,32 @@ export default function InboxActionModal({
   onConfirm,
   actionType,
 }) {
+  const { t } = useTranslation();
   const [memo, setMemo] = useState("");
+
+  const MODAL_CONFIG = {
+    approve: {
+      title: t("inbox.modal.approve_title"),
+      hasMemo: true,
+      description: t("inbox.modal.approve_desc"),
+      placeholder: t("inbox.modal.approve_placeholder"),
+      confirmLabel: t("inbox.modal.approve_confirm"),
+    },
+    reject: {
+      title: t("inbox.modal.reject_title"),
+      hasMemo: true,
+      description: t("inbox.modal.reject_desc"),
+      placeholder: t("inbox.modal.reject_placeholder"),
+      confirmLabel: t("inbox.modal.reject_confirm"),
+    },
+    reReview: {
+      title: t("inbox.modal.re_review_title"),
+      hasMemo: true,
+      description: t("inbox.modal.re_review_desc"),
+      placeholder: t("inbox.modal.re_review_placeholder"),
+      confirmLabel: t("inbox.modal.re_review_confirm"),
+    },
+  };
 
   const config = MODAL_CONFIG[actionType];
   if (!config) return null;
@@ -112,7 +114,7 @@ export default function InboxActionModal({
             </>
           ) : (
             <p className="text-base text-gray-500">
-              선택한 항목을 승인하시겠습니까?
+              {t("inbox.modal.approve_desc")}
             </p>
           )}
         </div>
@@ -124,7 +126,7 @@ export default function InboxActionModal({
             onClick={handleClose}
             className="flex-1 rounded border border-gray-200 py-2 text-base text-gray-500 transition-colors hover:bg-gray-50"
           >
-            취소
+            {t("common.cancel")}
           </button>
           <button
             type="button"

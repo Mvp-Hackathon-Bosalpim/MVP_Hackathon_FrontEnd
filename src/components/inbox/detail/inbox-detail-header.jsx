@@ -1,14 +1,18 @@
+import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import LeftIcon from "@/assets/icons/left-icon.svg?react";
-const REVIEW_STATUS_MAP = {
-  new: { label: "새 항목", className: "text-state-gold" },
-  pending: { label: "검토중", className: "text-state-warning" },
-  approved: { label: "승인", className: "text-state-success" },
-  rejected: { label: "반려", className: "text-state-error" },
-};
 
 function InboxDetailHeader({ data }) {
+  const { t } = useTranslation();
+
+  const REVIEW_STATUS_MAP = {
+    new: { label: t("inbox.status.new"), className: "text-state-gold" },
+    pending: { label: t("inbox.status.reviewing"), className: "text-state-warning" },
+    approved: { label: t("inbox.status.approved"), className: "text-state-success" },
+    rejected: { label: t("inbox.status.rejected"), className: "text-state-error" },
+  };
+
   const {
     doc_id,
     review_status,
@@ -31,39 +35,39 @@ function InboxDetailHeader({ data }) {
         className="mb-6 flex items-center font-bold text-gray-500"
       >
         <LeftIcon />
-        목록으로 돌아가기
+        {t("detail.back_to_list")}
       </Link>
       <div className="mb-6 flex w-full justify-between">
-        <HeaderCell label="데이터 ID">
+        <HeaderCell label={t("detail.data_id")}>
           <span className="text-primary-navy font-bold">#{doc_id}</span>
         </HeaderCell>
 
-        <HeaderCell label="현재 상태">
+        <HeaderCell label={t("detail.current_status")}>
           <span className={`font-bold ${status.className}`}>
             {status.label}
           </span>
         </HeaderCell>
 
-        <HeaderCell label="원본 파일">
+        <HeaderCell label={t("detail.original_file")}>
           <span className="max-w-40 overflow-hidden text-nowrap text-ellipsis text-gray-700">
             {source_ref.file_name}
           </span>
         </HeaderCell>
 
-        <HeaderCell label="행 번호">
+        <HeaderCell label={t("detail.row_number")}>
           <span className="text-gray-700">
             {current_index}
             <span className="text-gray-300"> /{total}</span>
           </span>
         </HeaderCell>
 
-        <HeaderCell label="생성일">
+        <HeaderCell label={t("detail.created_date")}>
           <span className="text-gray-700">
             {formatDateTime(effective_date)}
           </span>
         </HeaderCell>
 
-        <HeaderCell label="마지막 수정">
+        <HeaderCell label={t("detail.last_modified")}>
           <span className="text-gray-700">{formatDateTime(reviewed_at)}</span>
         </HeaderCell>
       </div>

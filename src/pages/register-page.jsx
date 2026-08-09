@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import DownloadIcon from "@/assets/icons/download-icon.svg?react";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
 import { PenLine } from "lucide-react";
@@ -7,14 +8,15 @@ import { cn } from "@/lib/utils";
 import FileUploadSection from "@/components/ui/file-upload-section";
 import ManualEntrySection from "@/components/ui/manual-entry-section";
 
-const TABS = [
-  { key: "upload", label: "파일 업로드", icon: UploadIcon },
-  { key: "manual", label: "수기 등록", icon: PenLine },
-];
-
 function RegisterPage() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.defaultTab ?? "upload");
+
+  const TABS = [
+    { key: "upload", label: t("reg.tab.upload"), icon: UploadIcon },
+    { key: "manual", label: t("reg.tab.manual"), icon: PenLine },
+  ];
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
@@ -23,10 +25,8 @@ function RegisterPage() {
           <DownloadIcon />
 
           <div>
-            <h2 className="text-3xl font-extrabold text-gray-700">증빙 데이터 등록</h2>
-            <p className="text-1xl text-gray-500">
-              파일 업로드 또는 수기 입력을 통해 증빙 데이터를 등록하세요.
-            </p>
+            <h2 className="text-3xl font-extrabold text-gray-700">{t("reg.title")}</h2>
+            <p className="text-1xl text-gray-500">{t("reg.desc")}</p>
           </div>
         </header>
 

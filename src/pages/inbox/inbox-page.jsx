@@ -2,14 +2,27 @@ import DownloadIcon from "@/assets/icons/download-icon.svg?react";
 import { cn, formatNumber } from "@/lib/utils";
 import useDocumentStatusCounts from "@/hooks/queries/inbox/use-document-status-counts";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import InboxResultFooter from "@/components/inbox/inbox-result-footer";
-import { INBOX_TABLE_THEAD } from "@/components/inbox/inbox-table-config";
 import useInboxSearchParams from "@/hooks/inbox/use-inbox-search-params";
 import InboxStatusRow from "@/components/inbox/inbox-status-row";
 import InboxRow from "@/components/inbox/inbox-row";
 import InboxSearchFilter from "@/components/inbox/inbox-search-filter";
 
+const INBOX_TABLE_THEAD_KEYS = [
+  "inbox.table.document",
+  "inbox.table.original",
+  "inbox.table.supplier",
+  "inbox.table.item",
+  "inbox.table.spec_unit",
+  "inbox.table.changed_unit_price",
+  "inbox.table.applied_date",
+  "common.status",
+  "inbox.table.pending_reason",
+];
+
 function InboxPage() {
+  const { t } = useTranslation();
   const [selectedIds, setSelectedIds] = useState([]);
 
   const {
@@ -25,13 +38,7 @@ function InboxPage() {
     handleFilterReset,
   } = useInboxSearchParams({ onNavigate: () => setSelectedIds([]) });
 
-  const [selectedStatus, setSelectedStatus] = useState(null);
-
-  const filteredContent = selectedStatus
-    ? (data?.content ?? []).filter(
-        (item) => item.review_status === selectedStatus,
-      )
-    : (data?.content ?? []);
+  const content = data?.content ?? [];
 
   const handleToggleSelect = (id) => {
     setSelectedIds((prev) =>
@@ -45,21 +52,14 @@ function InboxPage() {
         <DownloadIcon />
 
         <div>
-          <h2 className="mb-1 text-4xl font-bold text-gray-700">검수 인박스</h2>
-          <p className="text-2xl text-gray-500">
-            상태별로 필터링하고 항목을 열어 원본 근거를 확인한 뒤
-            수정•승인•반려하세요
-          </p>
+          <h2 className="mb-1 text-4xl font-bold text-gray-700">
+            {t("inbox.title")}
+          </h2>
+          <p className="text-2xl text-gray-500">{t("inbox.desc")}</p>
         </div>
       </header>
 
       <InboxStats className="mb-6" />
-
-      <InboxStatusFilter
-        selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
-        className="mb-4"
-      />
 
       <InboxSearchFilter />
 
@@ -69,12 +69,13 @@ function InboxPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="h-14 px-10" />
-                {INBOX_TABLE_THEAD.map((thead) => (
+
+                {INBOX_TABLE_THEAD_KEYS.map((key) => (
                   <th
-                    key={thead}
-                    className="h-14 px-4 text-left text-[22px] font-bold text-gray-500"
+                    key={key}
+                    className="h-14 px-4 text-left text-base font-bold text-gray-500"
                   >
-                    {thead}
+                    {t(key)}
                   </th>
                 ))}
               </tr>
@@ -90,17 +91,9 @@ function InboxPage() {
                 ) : (
                   <InboxStatusRow.Empty />
                 ))}
-              {!isPending &&
-                data &&
-                data.total_elements > 0 &&
-                filteredContent.length === 0 && (
-                  <InboxStatusRow.NoResult
-                    reset={() => setSelectedStatus(null)}
-                  />
-                )}
-              {!isPending && data && filteredContent.length > 0 && (
+              {!isPending && data && data.total_elements > 0 && (
                 <>
-                  {filteredContent.map((item) => (
+                  {content.map((item) => (
                     <InboxRow
                       key={item.id}
                       item={item}
@@ -121,7 +114,7 @@ function InboxPage() {
               pageSize={size}
               hasSelection={selectedIds.length > 0}
               selectedIds={selectedIds}
-              contentIds={filteredContent.map((item) => item.id)}
+              contentIds={content.map((item) => item.id)}
               onActionSuccess={() => setSelectedIds([])}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
@@ -129,59 +122,14 @@ function InboxPage() {
           )}
         </div>
       </div>
-
-      {/* <InboxResultTable /> */}
     </section>
   );
 }
 
 export default InboxPage;
 
-const STATUS_FILTER_CONFIG = [
-  { key: "NEW", label: "새 항목", countField: "new_count" },
-  { key: "NEEDS_REVIEW", label: "확인 필요", countField: "needs_review_count" },
-  { key: "ON_HOLD", label: "보류 필요", countField: "on_hold_count" },
-  { key: "APPROVED", label: "승인", countField: "approved_count" },
-  { key: "REJECTED", label: "반려", countField: "rejected_count" },
-];
-
-function InboxStatusFilter({ selectedStatus, onStatusChange, className }) {
-  const { data } = useDocumentStatusCounts();
-
-  return (
-    <div className={cn("flex items-center gap-4", className)}>
-      {STATUS_FILTER_CONFIG.map(({ key, label, countField }) => {
-        const isSelected = selectedStatus === key;
-        const count = data?.[countField] ?? 0;
-
-        return (
-          <button
-            key={key}
-            type="button"
-            onClick={() => onStatusChange(isSelected ? null : key)}
-            className={cn(
-              "flex items-center gap-2 rounded-full border border-gray-100 px-4 py-1.5 text-sm transition-colors",
-              isSelected
-                ? "border-primary-navy bg-primary-navy text-white"
-                : "bg-surface-200 text-gray-700",
-            )}
-          >
-            <span>{label}</span>
-            <span
-              className={cn(
-                "text-primary-navy flex aspect-square size-6 items-center justify-center rounded-full bg-white font-bold",
-              )}
-            >
-              {count}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 function InboxStats({ className }) {
+  const { t } = useTranslation();
   const { data } = useDocumentStatusCounts();
 
   const total = data
@@ -193,18 +141,18 @@ function InboxStats({ className }) {
     : null;
 
   const stats = [
-    { label: "전체", value: total },
-    { label: "검수 대기", value: data?.needs_review_count ?? null },
+    { label: t("inbox.stats.total"), value: total },
     {
-      label: "예외 탐지 (누락/중복/불일치)",
-      value: data?.on_hold_count ?? null,
+      label: t("inbox.stats.pending"),
+      value: data?.needs_review_count ?? null,
     },
-    { label: "승인", value: data?.approved_count ?? null },
-    { label: "반려", value: data?.rejected_count ?? null },
+    { label: t("inbox.stats.exception"), value: data?.on_hold_count ?? null },
+    { label: t("inbox.status.approved"), value: data?.approved_count ?? null },
+    { label: t("inbox.status.rejected"), value: data?.rejected_count ?? null },
   ];
 
-  const StatLabelClassName = "text-[24px] font-bold text-gray-500";
-  const StatValueClassName = "text-[24px] text-gray-500";
+  const StatLabelClassName = "text-lg font-bold text-gray-500";
+  const StatValueClassName = "text-lg text-gray-500";
 
   return (
     <ul className={cn("flex items-center gap-5", className)}>

@@ -1,22 +1,24 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn, formatDateTime } from "@/lib/utils";
 import { ChevronDownIcon } from "lucide-react";
 
-const TABS = ["변경 이력", "주석"];
 const INITIAL_SHOW = 3;
 
-const TABLE_HEADS = [
-  "일시",
-  "변경자",
-  "변경 항목",
-  "변경 전",
-  "변경 후",
-  "사유",
-];
-
 function AuditLogCard({ changeLog = [], comments = [] }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
   const [expanded, setExpanded] = useState(false);
+
+  const TABS = [t("detail.change_history"), t("detail.comments")];
+  const TABLE_HEADS = [
+    t("common.date_time"),
+    t("history.table.modifier"),
+    t("history.table.change_item"),
+    t("history.table.before_change"),
+    t("history.table.after_change"),
+    t("history.table.reason"),
+  ];
 
   const tabCounts = [changeLog.length, comments.length];
   const rows = activeTab === 0 ? changeLog : comments;
@@ -26,7 +28,7 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
   return (
     <section className="mt-6">
       <h2 className="mb-4 text-[20px] font-bold text-gray-700">
-        3. 변경 이력(Audit Log)
+        {t("detail.section_audit_log")}
       </h2>
 
       <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
@@ -73,7 +75,7 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
                   colSpan={6}
                   className="py-12 text-center text-[18px] text-gray-300"
                 >
-                  내역이 없습니다.
+                  {t("detail.no_history")}
                 </td>
               </tr>
             ) : (
@@ -110,7 +112,7 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
             onClick={() => setExpanded((v) => !v)}
             className="flex w-full items-center justify-center gap-1 border-t border-gray-100 py-4 text-[18px] text-gray-500"
           >
-            {expanded ? "접기" : "더보기"}
+            {expanded ? t("detail.collapse") : t("detail.load_more")}
             <ChevronDownIcon
               className={cn(
                 "size-4 transition-transform",

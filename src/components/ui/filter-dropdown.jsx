@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronDown, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Checkbox } from "./checkbox";
 
 /**
@@ -21,6 +22,7 @@ export default function FilterDropdown({
   onChange,
   isLoading = false,
 }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [draft, setDraft] = useState([]);
@@ -75,7 +77,7 @@ export default function FilterDropdown({
       ? placeholder
       : selected.length === 1
         ? selected[0]
-        : `${selected.length}개 선택`;
+        : t("common.n_selected", { count: selected.length });
 
   return (
     <div ref={ref} className="relative">
@@ -86,7 +88,7 @@ export default function FilterDropdown({
         className="hover:bg-surface-100 flex w-56 items-center justify-between rounded border border-gray-100 bg-white px-4 py-2 text-sm text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       >
         <span className={selected.length > 0 ? "text-gray-700" : ""}>
-          {isLoading ? "불러오는 중..." : triggerLabel}
+          {isLoading ? t("common.loading") : triggerLabel}
         </span>
         <ChevronDown size={16} className="shrink-0 text-gray-400" />
       </button>
@@ -110,7 +112,7 @@ export default function FilterDropdown({
               </div>
               <ul>
                 <li className="text-primary-gold bg-primary-gold/10 cursor-default px-4 py-2.5 text-sm font-medium">
-                  전체
+                  {t("common.all")}
                 </li>
               </ul>
             </div>
@@ -119,10 +121,10 @@ export default function FilterDropdown({
             <div className="flex-1">
               <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
                 <span className="text-sm font-semibold text-gray-700">
-                  전체
+                  {t("common.all")}
                 </span>
                 <span className="text-sm text-gray-500">
-                  총 {filteredOptions.length}개
+                  {t("common.total_count_n", { count: filteredOptions.length })}
                 </span>
               </div>
 
@@ -135,12 +137,12 @@ export default function FilterDropdown({
                     checked={isAllSelected}
                     className="size-5 border-gray-700 data-checked:bg-gray-700"
                   />
-                  전체 선택
+                  {t("common.select_all")}
                 </label>
 
                 {filteredOptions.length === 0 ? (
                   <p className="py-4 text-center text-sm text-gray-300">
-                    항목 없음
+                    {t("common.no_items")}
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-1">
@@ -169,14 +171,14 @@ export default function FilterDropdown({
               onClick={handleReset}
               className="hover:bg-surface-100 flex-1 rounded border border-gray-200 py-2 text-sm text-gray-500 transition-colors"
             >
-              초기화
+              {t("common.reset")}
             </button>
             <button
               type="button"
               onClick={handleApply}
               className="bg-primary-navy flex-1 rounded py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
-              적용
+              {t("common.apply")}
             </button>
           </div>
         </div>
