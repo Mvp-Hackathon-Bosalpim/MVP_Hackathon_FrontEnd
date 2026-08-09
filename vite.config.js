@@ -15,6 +15,12 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: env.VITE_BASE_API_URL,
           changeOrigin: true,
+          configure: (proxy) => {
+            proxy.on("proxyReq", (proxyReq) => {
+              // Origin 헤더를 target과 동일하게 바꿔서 서버의 CORS 체크를 통과
+              proxyReq.setHeader("origin", env.VITE_BASE_API_URL);
+            });
+          },
         },
       },
     },
