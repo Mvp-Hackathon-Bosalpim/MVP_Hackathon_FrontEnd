@@ -269,8 +269,28 @@
     "no_history": "내역이 없습니다.",
     "save_draft": "임시 저장",
     "approve_next": "승인 및 다음건 접수",
+    "next_review": "다음 건 검수",
     "approve_confirm": "승인",
     "reject_confirm": "반려"
+  },
+  "exception": {
+    "MISSING_REQUIRED": "필수값이 누락된 항목이 있습니다.",
+    "DUPLICATE_SUSPECTED": "중복 의심 항목입니다. 내용을 확인해주세요.",
+    "SPEC_MISMATCH": "규격 불일치가 감지되었습니다.",
+    "UNIT_MISMATCH": "단위 불일치가 감지되었습니다."
+  },
+  "changelog": {
+    "action": {
+      "APPROVE": "승인",
+      "REJECT": "반려",
+      "RE_REVIEW": "재검토",
+      "UPDATE": "수정",
+      "EDIT": "수정",
+      "CREATE": "생성",
+      "BULK_APPROVE": "일괄 승인",
+      "BULK_REJECT": "일괄 반려",
+      "BULK_RE_REVIEW": "일괄 재검토"
+    }
   },
   "reject": {
     "title": "반려 사유 입력",

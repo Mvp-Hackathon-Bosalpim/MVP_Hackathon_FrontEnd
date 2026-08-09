@@ -74,3 +74,72 @@ export const bulkReReview = async (body) => {
   const response = await client.post("/api/v1/documents/bulk-re-review", body);
   return response.data;
 };
+
+/**
+ * @typedef {Object} SourceRef
+ * @property {string} input_method
+ * @property {string} file_name
+ * @property {number} row_no
+ */
+
+/**
+ * @typedef {Object} ChangeLogDto
+ * @property {string} at
+ * @property {string} field
+ * @property {string} from
+ * @property {string} to
+ * @property {string} action
+ */
+
+/**
+ * @typedef {Object} ItemDetailResponseDto
+ * @property {string} doc_id
+ * @property {string} source_type
+ * @property {string} supplier_name
+ * @property {string} raw_item_name
+ * @property {string} normalized_item_name
+ * @property {string} spec
+ * @property {string} unit
+ * @property {number} price_before
+ * @property {number} price_after
+ * @property {string} effective_date
+ * @property {'NEW'|'NEEDS_REVIEW'|'ON_HOLD'|'APPROVED'|'REJECTED'} review_status
+ * @property {number} duplicate_group
+ * @property {string[]} exception_flags
+ * @property {SourceRef} source_ref
+ * @property {ChangeLogDto[]} change_log
+ * @property {number} previous_doc_id
+ * @property {number} next_doc_id
+ * @property {number} current_index
+ * @property {number} total
+ */
+
+/**
+ * @param {number} id
+ * @returns {Promise<ItemDetailResponseDto>}
+ */
+export const getDocument = async (id) => {
+  const response = await client.get(`/api/v1/documents/${id}`);
+  return response.data.data;
+};
+
+/**
+ * @typedef {Object} ItemUpdateRequestDto
+ * @property {string} [normalized_item_name]
+ * @property {string} [supplier_name]
+ * @property {string} [spec]
+ * @property {string} [unit]
+ * @property {number} [price_before]
+ * @property {number} [price_after]
+ * @property {string} [effective_date]
+ */
+
+/**
+ * @param {number} id
+ * @param {ItemUpdateRequestDto} body
+ * @returns {Promise<void>}
+ */
+export const updateDocument = async (id, body) => {
+  const response = await client.patch(`/api/v1/documents/${id}`, body);
+  return response.data;
+};

@@ -269,8 +269,28 @@
     "no_history": "No records found.",
     "save_draft": "Save as Draft",
     "approve_next": "Approve & Proceed to Next",
+    "next_review": "Next Review",
     "approve_confirm": "Approve",
     "reject_confirm": "Reject"
+  },
+  "exception": {
+    "MISSING_REQUIRED": "Some required fields are missing.",
+    "DUPLICATE_SUSPECTED": "This item is suspected to be a duplicate. Please review.",
+    "SPEC_MISMATCH": "Spec mismatch detected.",
+    "UNIT_MISMATCH": "Unit mismatch detected."
+  },
+  "changelog": {
+    "action": {
+      "APPROVE": "Approved",
+      "REJECT": "Rejected",
+      "RE_REVIEW": "Re-review",
+      "UPDATE": "Updated",
+      "EDIT": "Updated",
+      "CREATE": "Created",
+      "BULK_APPROVE": "Bulk Approved",
+      "BULK_REJECT": "Bulk Rejected",
+      "BULK_RE_REVIEW": "Bulk Re-review"
+    }
   },
   "reject": {
     "title": "Enter Rejection Reason",
