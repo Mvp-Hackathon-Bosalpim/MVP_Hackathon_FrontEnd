@@ -38,13 +38,7 @@ function InboxPage() {
     handleFilterReset,
   } = useInboxSearchParams({ onNavigate: () => setSelectedIds([]) });
 
-  const [selectedStatus, setSelectedStatus] = useState(null);
-
-  const filteredContent = selectedStatus
-    ? (data?.content ?? []).filter(
-        (item) => item.review_status === selectedStatus,
-      )
-    : (data?.content ?? []);
+  const content = data?.content ?? [];
 
   const handleToggleSelect = (id) => {
     setSelectedIds((prev) =>
@@ -58,18 +52,14 @@ function InboxPage() {
         <DownloadIcon />
 
         <div>
-          <h2 className="mb-1 text-4xl font-bold text-gray-700">{t("inbox.title")}</h2>
+          <h2 className="mb-1 text-4xl font-bold text-gray-700">
+            {t("inbox.title")}
+          </h2>
           <p className="text-2xl text-gray-500">{t("inbox.desc")}</p>
         </div>
       </header>
 
       <InboxStats className="mb-6" />
-
-      <InboxStatusFilter
-        selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
-        className="mb-4"
-      />
 
       <InboxSearchFilter />
 
@@ -79,10 +69,11 @@ function InboxPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="h-14 px-10" />
+
                 {INBOX_TABLE_THEAD_KEYS.map((key) => (
                   <th
                     key={key}
-                    className="h-14 px-4 text-left text-[22px] font-bold text-gray-500"
+                    className="h-14 px-4 text-left text-base font-bold text-gray-500"
                   >
                     {t(key)}
                   </th>
@@ -100,17 +91,9 @@ function InboxPage() {
                 ) : (
                   <InboxStatusRow.Empty />
                 ))}
-              {!isPending &&
-                data &&
-                data.total_elements > 0 &&
-                filteredContent.length === 0 && (
-                  <InboxStatusRow.NoResult
-                    reset={() => setSelectedStatus(null)}
-                  />
-                )}
-              {!isPending && data && filteredContent.length > 0 && (
+              {!isPending && data && data.total_elements > 0 && (
                 <>
-                  {filteredContent.map((item) => (
+                  {content.map((item) => (
                     <InboxRow
                       key={item.id}
                       item={item}
@@ -131,7 +114,7 @@ function InboxPage() {
               pageSize={size}
               hasSelection={selectedIds.length > 0}
               selectedIds={selectedIds}
-              contentIds={filteredContent.map((item) => item.id)}
+              contentIds={content.map((item) => item.id)}
               onActionSuccess={() => setSelectedIds([])}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
@@ -144,51 +127,6 @@ function InboxPage() {
 }
 
 export default InboxPage;
-
-const STATUS_FILTER_CONFIG = [
-  { key: "NEW", labelKey: "inbox.status.new", countField: "new_count" },
-  { key: "NEEDS_REVIEW", labelKey: "inbox.status.needs_check", countField: "needs_review_count" },
-  { key: "ON_HOLD", labelKey: "inbox.status.on_hold", countField: "on_hold_count" },
-  { key: "APPROVED", labelKey: "inbox.status.approved", countField: "approved_count" },
-  { key: "REJECTED", labelKey: "inbox.status.rejected", countField: "rejected_count" },
-];
-
-function InboxStatusFilter({ selectedStatus, onStatusChange, className }) {
-  const { t } = useTranslation();
-  const { data } = useDocumentStatusCounts();
-
-  return (
-    <div className={cn("flex items-center gap-4", className)}>
-      {STATUS_FILTER_CONFIG.map(({ key, labelKey, countField }) => {
-        const isSelected = selectedStatus === key;
-        const count = data?.[countField] ?? 0;
-
-        return (
-          <button
-            key={key}
-            type="button"
-            onClick={() => onStatusChange(isSelected ? null : key)}
-            className={cn(
-              "flex items-center gap-2 rounded-full border border-gray-100 px-4 py-1.5 text-sm transition-colors",
-              isSelected
-                ? "border-primary-navy bg-primary-navy text-white"
-                : "bg-surface-200 text-gray-700",
-            )}
-          >
-            <span>{t(labelKey)}</span>
-            <span
-              className={cn(
-                "text-primary-navy flex aspect-square size-6 items-center justify-center rounded-full bg-white font-bold",
-              )}
-            >
-              {count}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 function InboxStats({ className }) {
   const { t } = useTranslation();
@@ -204,14 +142,17 @@ function InboxStats({ className }) {
 
   const stats = [
     { label: t("inbox.stats.total"), value: total },
-    { label: t("inbox.stats.pending"), value: data?.needs_review_count ?? null },
+    {
+      label: t("inbox.stats.pending"),
+      value: data?.needs_review_count ?? null,
+    },
     { label: t("inbox.stats.exception"), value: data?.on_hold_count ?? null },
     { label: t("inbox.status.approved"), value: data?.approved_count ?? null },
     { label: t("inbox.status.rejected"), value: data?.rejected_count ?? null },
   ];
 
-  const StatLabelClassName = "text-[24px] font-bold text-gray-500";
-  const StatValueClassName = "text-[24px] text-gray-500";
+  const StatLabelClassName = "text-lg font-bold text-gray-500";
+  const StatValueClassName = "text-lg text-gray-500";
 
   return (
     <ul className={cn("flex items-center gap-5", className)}>

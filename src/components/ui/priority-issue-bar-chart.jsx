@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { BarChart, Bar, XAxis, YAxis, Cell, LabelList, ResponsiveContainer } from "recharts";
 
 const AXIS_TICKS = [0, 20, 40, 60, 80];
@@ -5,22 +6,32 @@ const AXIS_TICKS = [0, 20, 40, 60, 80];
 function ValueLabel({ x, y, width, height, value, percent }) {
   return (
     <text x={x + width + 8} y={y + height / 2} dy={4} className="fill-gray-700 text-sm font-medium">
-      {value}건 ({percent}%)
+      {value}{percent}
     </text>
   );
 }
 
 export default function PriorityIssueBarChart({ issues = [], totalErrorCount, totalDataCount }) {
-  const errorRatio = totalErrorCount && totalDataCount ? ((totalErrorCount / totalDataCount) * 100).toFixed(1) : null;
+  const { t } = useTranslation();
+
+  const errorRatio = totalErrorCount && totalDataCount
+    ? ((totalErrorCount / totalDataCount) * 100).toFixed(1)
+    : null;
+
+  const unit = t("common.count_unit");
 
   return (
     <div className="flex-1 flex items-center gap-6 px-4 py-4">
       <div className="shrink-0 w-36">
-        <p className="text-sm text-gray-500">총 오류 건수</p>
+        <p className="text-sm text-gray-500">{t("dashboard.total_error_count")}</p>
         <p className="text-3xl font-bold text-gray-700">
-          {totalErrorCount ?? "-"} <span className="text-base font-normal text-gray-500">건</span>
+          {totalErrorCount ?? "-"} <span className="text-base font-normal text-gray-500">{unit}</span>
         </p>
-        <p className="mt-1 text-sm text-gray-500">전체 데이터 중 {errorRatio ?? "-"}%</p>
+        <p className="mt-1 text-sm text-gray-500">
+          {errorRatio !== null
+            ? t("dashboard.error_ratio", { ratio: errorRatio })
+            : "-"}
+        </p>
       </div>
 
       <div className="flex-1 h-44">
@@ -49,7 +60,9 @@ export default function PriorityIssueBarChart({ issues = [], totalErrorCount, to
                 content={(props) => (
                   <ValueLabel
                     {...props}
-                    percent={totalErrorCount ? ((props.value / totalErrorCount) * 100).toFixed(1) : "-"}
+                    percent={totalErrorCount
+                      ? `${unit} (${((props.value / totalErrorCount) * 100).toFixed(1)}%)`
+                      : unit}
                   />
                 )}
               />

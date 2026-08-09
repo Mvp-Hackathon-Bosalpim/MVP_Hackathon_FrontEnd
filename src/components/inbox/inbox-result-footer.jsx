@@ -83,14 +83,14 @@ function InboxResultFooter({
         <button
           type="button"
           onClick={() => openModal("reReview", "bulk")}
-          className="text-surface-100 flex w-40 items-center justify-center rounded-sm bg-[#2C5691] p-0 py-3 text-[22px] font-bold"
+          className="text-surface-100 flex w-40 items-center justify-center rounded-sm bg-[#2C5691] p-0 py-3 text-base font-bold"
         >
           {t("inbox.action.re_review")}
         </button>
         <button
           type="button"
           onClick={() => openModal("approve", "bulk")}
-          className="text-surface-100 bg-primary-navy flex w-40 items-center justify-center rounded-sm p-0 py-3 text-[22px] font-bold"
+          className="text-surface-100 bg-primary-navy flex w-40 items-center justify-center rounded-sm p-0 py-3 text-base font-bold"
         >
           {t("inbox.action.bulk_approve")}
         </button>
@@ -98,14 +98,14 @@ function InboxResultFooter({
           type="button"
           onClick={() => openModal("approve", "selected")}
           disabled={!hasSelection}
-          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-[22px] disabled:cursor-not-allowed disabled:opacity-40"
+          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-base disabled:cursor-not-allowed disabled:opacity-40"
         >
           {t("inbox.action.approve_selected")}
         </button>
         <button
           type="button"
           onClick={() => openModal("reject", "bulk")}
-          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-[22px]"
+          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-base"
         >
           {t("inbox.action.bulk_reject")}
         </button>
@@ -113,7 +113,7 @@ function InboxResultFooter({
           type="button"
           onClick={() => openModal("reject", "selected")}
           disabled={!hasSelection}
-          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-[22px] disabled:cursor-not-allowed disabled:opacity-40"
+          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-base disabled:cursor-not-allowed disabled:opacity-40"
         >
           {t("inbox.action.reject_selected")}
         </button>

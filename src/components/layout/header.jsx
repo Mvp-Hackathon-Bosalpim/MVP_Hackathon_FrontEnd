@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Bell, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const NAV_KEYS = [
   { key: "nav.dashboard", to: "/" },
@@ -58,19 +59,20 @@ export default function Header() {
         <div className="flex h-full items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="border-border text-primary-navy flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-sm font-medium hover:bg-gray-50">
+              <button className="text-primary-navy flex items-center gap-1.5 rounded-sm border border-gray-100 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50">
                 Lang
                 <ChevronDown size={14} />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-36">
+            <DropdownMenuContent align="end" className="min-w-36 rounded-sm">
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
                   onClick={() => handleLangChange(lang.code)}
-                  className={
-                    i18n.language === lang.code ? "font-semibold" : ""
-                  }
+                  className={cn(
+                    "focus:!bg-surface-100 rounded-none border-b border-gray-100 px-4 py-3 last:border-0",
+                    i18n.language === lang.code && "font-semibold",
+                  )}
                 >
                   {t(lang.labelKey)}
                 </DropdownMenuItem>
@@ -78,12 +80,8 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <button className="hover:text-primary-navy text-gray-300">
-            <Bell size={20} />
-          </button>
-
           <div className="flex items-center gap-2">
-            <div className="bg-muted h-8 w-8 rounded-full" />
+            <div className="h-8 w-8 rounded-full bg-white" />
             <span className="text-primary-navy text-base">관리자</span>
           </div>
         </div>

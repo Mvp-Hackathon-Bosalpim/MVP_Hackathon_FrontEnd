@@ -14,8 +14,9 @@ export default function useInboxSearchParams({ onNavigate } = {}) {
   const supplierName = searchParams.get("supplierName") ?? "";
   const startDate = searchParams.get("startDate") ?? "";
   const endDate = searchParams.get("endDate") ?? "";
+  const reviewStatus = searchParams.get("reviewStatus") ?? "";
 
-  const hasFilter = !!(itemName || supplierName || startDate || endDate);
+  const hasFilter = !!(itemName || supplierName || startDate || endDate || reviewStatus);
 
   const {
     data: docData,
@@ -36,6 +37,7 @@ export default function useInboxSearchParams({ onNavigate } = {}) {
         supplier_names: supplierName ? supplierName.split(",") : [],
         ...(startDate && { start_date: startDate }),
         ...(endDate && { end_date: endDate }),
+        ...(reviewStatus && { review_status: reviewStatus }),
       },
       params: { page, size },
     },
@@ -67,8 +69,8 @@ export default function useInboxSearchParams({ onNavigate } = {}) {
   const handleFilterReset = () => {
     onNavigate?.();
     setSearchParams((prev) => {
-      ["itemName", "supplierName", "startDate", "endDate"].forEach((key) =>
-        prev.delete(key),
+      ["itemName", "supplierName", "startDate", "endDate", "reviewStatus"].forEach(
+        (key) => prev.delete(key),
       );
       prev.set("page", 0);
       prev.set("size", 20);
@@ -79,6 +81,7 @@ export default function useInboxSearchParams({ onNavigate } = {}) {
   return {
     page,
     size,
+    reviewStatus,
     hasFilter,
     data,
     isPending,
