@@ -9,12 +9,13 @@
  */
 
 /**
+ * @template T
  * @typedef {Object} PageResponseDto
- * @property {ItemListResponseDto[]} content
+ * @property {T} content
  * @property {number} page
  * @property {number} size
- * @property {number} totalElements
- * @property {number} totalPages
+ * @property {number} total_elements
+ * @property {number} total_pages
  */
 
 /**

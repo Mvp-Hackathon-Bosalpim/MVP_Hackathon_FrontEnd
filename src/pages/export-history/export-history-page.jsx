@@ -33,7 +33,11 @@ function formatDateTime(date) {
 }
 
 function startOfDay(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  ).getTime();
 }
 
 // 일시 필터를 실제로 확인할 수 있도록, 행마다 실제 날짜(20일 구간에 분산)를 부여
@@ -57,7 +61,7 @@ const EXPORT_FILES = Array.from({ length: 62 }, (_, i) => {
   };
 });
 
-const DEFAULT_PAGE_SIZE = 6;
+const DEFAULT_PAGE_SIZE = 20;
 
 export default function ExportHistoryPage() {
   const navigate = useNavigate();
@@ -78,13 +82,17 @@ export default function ExportHistoryPage() {
       // 일시 필터: 시작~종료일이 모두 선택된 경우에만 날짜 단위로 비교
       if (dateRange.start && dateRange.end) {
         const fileDay = startOfDay(file.date);
-        if (fileDay < startOfDay(dateRange.start) || fileDay > startOfDay(dateRange.end)) {
+        if (
+          fileDay < startOfDay(dateRange.start) ||
+          fileDay > startOfDay(dateRange.end)
+        ) {
           return false;
         }
       }
 
       // 파일명 검색
-      if (keyword && !file.fileName.toLowerCase().includes(keyword)) return false;
+      if (keyword && !file.fileName.toLowerCase().includes(keyword))
+        return false;
 
       return true;
     });
@@ -132,9 +140,12 @@ export default function ExportHistoryPage() {
         <div className="flex items-center gap-4">
           <ExportHistoryIcon className="h-10 w-10 shrink-0" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-700">데이터 내보내기 이력</h1>
+            <h1 className="text-2xl font-bold text-gray-700">
+              데이터 내보내기 이력
+            </h1>
             <p className="text-sm text-gray-500">
-              최근 생성된 JSON/CSV 파일을 조회하고 필요한 파일을 다시 다운로드할 수 있습니다.
+              최근 생성된 JSON/CSV 파일을 조회하고 필요한 파일을 다시 다운로드할
+              수 있습니다.
             </p>
           </div>
         </div>
@@ -142,7 +153,7 @@ export default function ExportHistoryPage() {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="flex items-center gap-1.5 rounded border border-gray-100 bg-surface-0 px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-surface-100"
+          className="bg-surface-0 hover:bg-surface-100 flex items-center gap-1.5 rounded border border-gray-100 px-3 py-2 text-sm text-gray-500 transition-colors"
         >
           <ArrowLeft size={16} />
           대시보드로 돌아가기
@@ -161,10 +172,14 @@ export default function ExportHistoryPage() {
       />
 
       {/* 데이터 카드 */}
-      <div className="overflow-hidden rounded-lg border border-surface-200 bg-surface-0">
+      <div className="border-surface-200 bg-surface-0 overflow-hidden rounded-lg border">
         <div className="px-4 py-3">
           <span className="text-sm text-gray-500">
-            총 <span className="font-bold text-gray-700">{filteredFiles.length}</span>건
+            총{" "}
+            <span className="font-bold text-gray-700">
+              {filteredFiles.length}
+            </span>
+            건
           </span>
         </div>
 
@@ -173,6 +188,7 @@ export default function ExportHistoryPage() {
         <Pagination
           currentPage={page}
           totalPages={totalPages}
+          pageSize={pageSize}
           onPageChange={setPage}
           onPageSizeChange={handlePageSizeChange}
         />
