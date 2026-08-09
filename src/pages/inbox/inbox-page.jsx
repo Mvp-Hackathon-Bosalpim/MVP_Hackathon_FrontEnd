@@ -40,10 +40,21 @@ function InboxPage() {
 
   const content = data?.content ?? [];
 
+  const isAllSelected =
+    content.length > 0 && content.every((item) => selectedIds.includes(item.id));
+
   const handleToggleSelect = (id) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
+  };
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(content.map((item) => item.id));
+    }
   };
 
   return (
@@ -108,7 +119,9 @@ function InboxPage() {
 
           {!isPending && data && (
             <InboxResultFooter
-              totalElements={data.total_elements}
+              selectedCount={selectedIds.length}
+              isAllSelected={isAllSelected}
+              onSelectAll={handleSelectAll}
               currentPage={page + 1}
               totalPages={data.total_pages}
               pageSize={size}

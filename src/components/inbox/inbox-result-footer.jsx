@@ -1,15 +1,20 @@
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { formatNumber } from "@/lib/utils";
 import Pagination from "../ui/export-pagination";
 import InboxActionModal from "./inbox-action-modal";
+import { Checkbox } from "../ui/checkbox";
 import useBulkApprove from "@/hooks/mutations/inbox/use-bulk-approve";
 import useBulkReject from "@/hooks/mutations/inbox/use-bulk-reject";
 import useBulkReReview from "@/hooks/mutations/inbox/use-bulk-re-review";
+import useBulkDelete from "@/hooks/mutations/inbox/use-bulk-delete";
+import InboxExportModal from "./inbox-export-modal";
 
 /**
  * @typedef {Object} InboxResultFooterProps
- * @property {number} totalElements
+ * @property {number} selectedCount
+ * @property {boolean} isAllSelected
+ * @property {() => void} onSelectAll
  * @property {number} currentPage
  * @property {number} totalPages
  * @property {number} pageSize
@@ -23,10 +28,12 @@ import useBulkReReview from "@/hooks/mutations/inbox/use-bulk-re-review";
 
 /** @param {InboxResultFooterProps} props */
 function InboxResultFooter({
+  selectedCount,
+  isAllSelected,
+  onSelectAll,
   currentPage,
   onPageChange,
   onPageSizeChange,
-  totalElements,
   totalPages,
   pageSize,
   hasSelection,
@@ -36,10 +43,12 @@ function InboxResultFooter({
 }) {
   const { t } = useTranslation();
   const [modalState, setModalState] = useState(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   const bulkApprove = useBulkApprove();
   const bulkReject = useBulkReject();
   const bulkReReview = useBulkReReview();
+  const bulkDelete = useBulkDelete();
 
   const handleConfirm = (memo) => {
     const { type, target } = modalState;
@@ -60,6 +69,14 @@ function InboxResultFooter({
     });
   };
 
+  const handleDelete = () => {
+    if (!hasSelection) return;
+    bulkDelete.mutate(
+      { ids: selectedIds },
+      { onSuccess: () => onActionSuccess?.() },
+    );
+  };
+
   const openModal = (type, target) => setModalState({ type, target });
 
   return (
@@ -72,28 +89,30 @@ function InboxResultFooter({
           totalPages={totalPages}
           pageSize={pageSize}
           leftSlot={
-            <span className="text-[20px] text-gray-500">
-              {t("export.total_items", { count: formatNumber(totalElements) })}
-            </span>
+            <div className="flex items-center gap-3">
+              <Checkbox
+                checked={isAllSelected}
+                onClick={onSelectAll}
+                className="size-6 border-gray-700 data-checked:bg-gray-700"
+              />
+              <span className="text-[20px] text-gray-500">
+                {selectedCount}개 선택됨
+              </span>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={!hasSelection || bulkDelete.isPending}
+                className="flex items-center gap-2 border border-gray-100 px-4 py-2 text-base disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Trash2 className="size-4" />
+                선택 삭제
+              </button>
+            </div>
           }
         />
       </div>
 
       <div className="flex items-center justify-end gap-3 px-4 pb-4">
-        <button
-          type="button"
-          onClick={() => openModal("reReview", "bulk")}
-          className="text-surface-100 flex w-40 items-center justify-center rounded-sm bg-[#2C5691] p-0 py-3 text-base font-bold"
-        >
-          {t("inbox.action.re_review")}
-        </button>
-        <button
-          type="button"
-          onClick={() => openModal("approve", "bulk")}
-          className="text-surface-100 bg-primary-navy flex w-40 items-center justify-center rounded-sm p-0 py-3 text-base font-bold"
-        >
-          {t("inbox.action.bulk_approve")}
-        </button>
         <button
           type="button"
           onClick={() => openModal("approve", "selected")}
@@ -102,13 +121,7 @@ function InboxResultFooter({
         >
           {t("inbox.action.approve_selected")}
         </button>
-        <button
-          type="button"
-          onClick={() => openModal("reject", "bulk")}
-          className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-base"
-        >
-          {t("inbox.action.bulk_reject")}
-        </button>
+
         <button
           type="button"
           onClick={() => openModal("reject", "selected")}
@@ -117,7 +130,20 @@ function InboxResultFooter({
         >
           {t("inbox.action.reject_selected")}
         </button>
+
+        <button
+          type="button"
+          onClick={() => setExportModalOpen(true)}
+          className="bg-primary-navy text-surface-100 flex w-40 items-center justify-center rounded-sm p-0 py-3 text-base font-bold"
+        >
+          {t("export.confirm")}
+        </button>
       </div>
+
+      <InboxExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+      />
 
       <InboxActionModal
         isOpen={modalState !== null}

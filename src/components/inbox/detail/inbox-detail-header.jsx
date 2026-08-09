@@ -6,17 +6,9 @@ import LeftIcon from "@/assets/icons/left-icon.svg?react";
 function InboxDetailHeader({ data }) {
   const { t } = useTranslation();
 
-  const REVIEW_STATUS_MAP = {
-    NEW: { label: t("inbox.status.new"), className: "text-state-gold" },
-    NEEDS_REVIEW: { label: t("inbox.status.needs_check"), className: "text-state-warning" },
-    ON_HOLD: { label: t("inbox.status.on_hold"), className: "text-state-warning" },
-    APPROVED: { label: t("inbox.status.approved"), className: "text-state-success" },
-    REJECTED: { label: t("inbox.status.rejected"), className: "text-state-error" },
-  };
-
   const {
     doc_id,
-    review_status,
+    exception_flags,
     source_ref,
     current_index,
     total,
@@ -24,10 +16,7 @@ function InboxDetailHeader({ data }) {
     effective_date,
   } = data;
 
-  const status = REVIEW_STATUS_MAP[review_status] ?? {
-    label: review_status,
-    className: "text-gray-500",
-  };
+  const flags = exception_flags ?? [];
 
   return (
     <>
@@ -44,9 +33,15 @@ function InboxDetailHeader({ data }) {
         </HeaderCell>
 
         <HeaderCell label={t("detail.current_status")}>
-          <span className={`font-bold ${status.className}`}>
-            {status.label}
-          </span>
+          {flags.length > 0 ? (
+            <span className="font-bold text-state-warning">
+              {flags.map((f) => t(`exception.label.${f}`, f)).join(", ")}
+            </span>
+          ) : (
+            <span className="font-bold text-state-success">
+              {t("exception.label.approvable")}
+            </span>
+          )}
         </HeaderCell>
 
         <HeaderCell label={t("detail.original_file")}>

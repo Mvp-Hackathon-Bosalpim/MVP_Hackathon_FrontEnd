@@ -6,6 +6,8 @@ import useDocument from "@/hooks/queries/inbox/use-document";
 import useUpdateDocument from "@/hooks/mutations/inbox/use-update-document";
 import useApproveDocument from "@/hooks/mutations/inbox/use-approve-document";
 import useRejectDocument from "@/hooks/mutations/inbox/use-reject-document";
+import useBulkReReview from "@/hooks/mutations/inbox/use-bulk-re-review";
+import useDeleteDocument from "@/hooks/mutations/inbox/use-delete-document";
 import InboxDetailHeader from "@/components/inbox/detail/inbox-detail-header";
 import MappingEditCard from "@/components/inbox/detail/mapping-edit-card";
 import SourceDataCard from "@/components/inbox/detail/source-data-card";
@@ -13,8 +15,8 @@ import AuditLogCard from "@/components/inbox/detail/audit-log-card";
 import InboxActionModal from "@/components/inbox/inbox-action-modal";
 import { inboxKeys } from "@/constants/query-keys";
 import CircleXIcon from "@/assets/icons/circle-x-icon.svg?react";
-import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
+import { Trash2 } from "lucide-react";
 
 function InboxDetailPage() {
   const queryClient = useQueryClient();
@@ -24,11 +26,14 @@ function InboxDetailPage() {
 
   const cardRef = useRef(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [reReviewModalOpen, setReReviewModalOpen] = useState(false);
 
   const { data, isPending, isError, refetch } = useDocument(docId);
   const updateMutation = useUpdateDocument();
   const approveMutation = useApproveDocument();
   const rejectMutation = useRejectDocument();
+  const reReviewMutation = useBulkReReview();
+  const deleteMutation = useDeleteDocument();
 
   const isApproved = data?.review_status === "APPROVED";
 
@@ -38,7 +43,9 @@ function InboxDetailPage() {
       {
         onSuccess: () => {
           cardRef.current?.resetTo(formValues);
-          queryClient.invalidateQueries({ queryKey: inboxKeys.document(docId) });
+          queryClient.invalidateQueries({
+            queryKey: inboxKeys.document(docId),
+          });
         },
       },
     );
@@ -78,6 +85,34 @@ function InboxDetailPage() {
           } else {
             navigate("/inbox");
           }
+        },
+      },
+    );
+  };
+
+  const handleDelete = () => {
+    deleteMutation.mutate(Number(docId), {
+      onSuccess: () => {
+        queryClient.removeQueries({ queryKey: inboxKeys.document(docId) });
+        queryClient.invalidateQueries({ queryKey: inboxKeys.all });
+        if (data?.next_doc_id) {
+          navigate(`/inbox/${data.next_doc_id}`);
+        } else {
+          navigate("/inbox");
+        }
+      },
+    });
+  };
+
+  const handleReReviewConfirm = (memo) => {
+    reReviewMutation.mutate(
+      { ids: [Number(docId)], ...(memo && { memo }) },
+      {
+        onSuccess: () => {
+          setReReviewModalOpen(false);
+          queryClient.invalidateQueries({
+            queryKey: inboxKeys.document(docId),
+          });
         },
       },
     );
@@ -136,6 +171,16 @@ function InboxDetailPage() {
       <div className="flex items-center justify-end gap-4 pt-6">
         <button
           type="button"
+          onClick={handleDelete}
+          disabled={deleteMutation.isPending}
+          className="border-primary-navy text-primary-navy flex items-center gap-3 rounded-md border-2 bg-white px-12 py-2 disabled:opacity-50"
+        >
+          <Trash2 className="size-5" />
+          {t("detail.delete")}
+        </button>
+
+        <button
+          type="button"
           onClick={() => setRejectModalOpen(true)}
           className="border-primary-navy text-primary-navy flex items-center gap-3 rounded-md border-2 bg-white px-12 py-2"
         >
@@ -145,12 +190,11 @@ function InboxDetailPage() {
 
         <button
           type="button"
-          onClick={() => cardRef.current?.save()}
-          disabled={updateMutation.isPending}
+          onClick={() => setReReviewModalOpen(true)}
+          disabled={reReviewMutation.isPending}
           className="border-primary-navy text-primary-navy flex items-center gap-3 rounded-md border-2 bg-white px-12 py-2 disabled:opacity-50"
         >
-          <FileOutlineIcon className="size-5" />
-          {t("detail.save_draft")}
+          {t("inbox.action.re_review")}
         </button>
 
         {isApproved ? (
@@ -180,6 +224,13 @@ function InboxDetailPage() {
         onClose={() => setRejectModalOpen(false)}
         onConfirm={handleRejectConfirm}
         actionType="reject"
+      />
+
+      <InboxActionModal
+        isOpen={reReviewModalOpen}
+        onClose={() => setReReviewModalOpen(false)}
+        onConfirm={handleReReviewConfirm}
+        actionType="reReview"
       />
     </div>
   );
