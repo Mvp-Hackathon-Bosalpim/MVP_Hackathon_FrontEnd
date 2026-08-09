@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import TrashIcon from "@/assets/icons/trash-icon.svg?react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { createManualDocument } from "@/services/api/document";
+import useCreateManualDocument from "@/hooks/mutations/document/use-create-manual-document";
 
 const EMPTY_ROW = {
     공급사: "",
@@ -26,15 +26,15 @@ function ManualEntrySection() {
     const [rows, setRows] = useState([{ ...EMPTY_ROW }, { ...EMPTY_ROW }]);
 
     const [submitAttempted, setSubmitAttempted] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
+    const { mutate: createManualDocument, isPending: isSubmitting } = useCreateManualDocument();
 
     const emptyIndexes = rows.reduce((acc, row, idx) => {
         if (isRowEmpty(row)) acc.add(idx);
         return acc;
     }, new Set());
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setSubmitAttempted(true);
         setSubmitError(null);
         if (emptyIndexes.size > 0) return;
@@ -49,15 +49,10 @@ function ManualEntrySection() {
             effective_date: row.적용일,
         }));
 
-        setIsSubmitting(true);
-        try {
-            await createManualDocument(items);
-            navigate("/inbox");
-        } catch (err) {
-            setSubmitError(err.response?.data?.message ?? t("reg.manual.register_failed_default"));
-        } finally {
-            setIsSubmitting(false);
-        }
+        createManualDocument(items, {
+            onSuccess: () => navigate("/inbox"),
+            onError: (err) => setSubmitError(err.response?.data?.message ?? t("reg.manual.register_failed_default")),
+        });
     };
 
     const addRow = () => setRows((prev) => [...prev, { ...EMPTY_ROW }]);
