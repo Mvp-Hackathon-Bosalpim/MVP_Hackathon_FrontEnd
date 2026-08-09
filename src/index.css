@@ -111,6 +111,7 @@
   --color-state-success: #1E9800;
   --color-state-warning: #E38359;
   --color-state-gold: #D5A548;
+  --color-issue-unit: #B471DA;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -192,6 +193,7 @@ body,
   --color-state-success: var(--color-state-success);
   --color-state-warning: var(--color-state-warning);
   --color-state-gold: var(--color-state-gold);
+  --color-issue-unit: var(--color-issue-unit);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
