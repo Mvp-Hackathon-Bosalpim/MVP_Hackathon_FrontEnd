@@ -3,34 +3,34 @@ import { Checkbox } from "../ui/checkbox";
 import { useNavigate } from "react-router-dom";
 
 const INBOX_STATUS_BADGE_CONFIG = {
-  new: {
-    label: "승인 가능",
-    dot: "bg-primary-navy",
-    text: "text-primary-navy",
+  NEW: {
+    label: "새 항목",
+    dot: "bg-[#31598D]",
+    text: "text-[#31598D]",
   },
-  need_review: {
+  NEEDS_REVIEW: {
     label: "확인 필요",
     dot: "bg-state-gold",
     text: "text-state-gold",
   },
-  on_hold: {
+  ON_HOLD: {
     label: "중복 의심",
     dot: "bg-state-warning",
     text: "text-state-warning",
   },
-  approved: {
+  APPROVED: {
     label: "승인",
     dot: "bg-state-success",
     text: "text-state-success",
   },
-  rejected: { label: "반려", dot: "bg-state-error", text: "text-state-error" },
+  REJECTED: { label: "반려", dot: "bg-state-error", text: "text-state-error" },
 };
 
 function InboxSourceTypeBadge({ sourceType }) {
   return (
     <div
       className={cn(
-        "text-surface-100 text-stat text-surface-100 inline rounded-md px-4 py-2 text-center font-bold",
+        "text-surface-100 inline rounded-md px-4 py-2 text-center font-bold",
         sourceType === "수기" ? "bg-[#2C5691]" : "bg-primary-navy",
       )}
     >
@@ -56,16 +56,28 @@ function InboxStatusBadge({ reviewStatus }) {
   );
 }
 
-function InboxRow({ item }) {
+/**
+ * @typedef {Object} InboxRowProps
+ * @property {InboxItemDetailDto} item
+ * @property {boolean} isSelected
+ * @property {(id: number) => void} onToggle
+ */
+
+/**@param {InboxRowProps} props */
+function InboxRow({ item, isSelected, onToggle }) {
   const navigate = useNavigate();
 
   return (
     <tr
-      onClick={() => navigate(`/inbox/${item.doc_id}`)}
+      onClick={() => navigate(`/inbox/${item.id}`)}
       className="h-18 w-full cursor-pointer border-t border-gray-100"
     >
       <td align="center" onClick={(e) => e.stopPropagation()}>
-        <Checkbox className="size-6 border-gray-700 data-checked:bg-gray-700" />
+        <Checkbox
+          checked={isSelected}
+          onClick={() => onToggle(item.id)}
+          className="size-6 border-gray-700 data-checked:bg-gray-700"
+        />
       </td>
 
       {/* 문서 */}
@@ -125,14 +137,15 @@ function InboxRow({ item }) {
 
       {/* 대기이유 */}
       <td className="pl-4">
-        {item.exception_flags.length > 0 ? (
+        <span className="text-gray-500">—</span>
+        {/* {item.exception_flags.length > 0 ? (
           <span className="flex items-center gap-2 text-[20px] font-bold text-[#D5A548]">
             <span className="size-3 rounded-full bg-[#D5A548]" />
             사유 있음
           </span>
         ) : (
-          <span className="text-gray-500">—</span>
-        )}
+        <></>
+        )} */}
       </td>
     </tr>
   );
