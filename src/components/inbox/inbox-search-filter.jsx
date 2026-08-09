@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { RotateCcw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import ExportDateRangePicker from "@/components/ui/export-date-range-picker";
 import FilterDropdown from "@/components/ui/filter-dropdown";
 import useNormalizedItemNames from "@/hooks/queries/inbox/use-normalized-item-names";
@@ -7,6 +8,7 @@ import useSupplierNames from "@/hooks/queries/inbox/use-supplier-names";
 import { formatDate, parseDateParam } from "@/lib/utils";
 
 export default function InboxSearchFilter() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const itemName = searchParams.get("itemName") ?? "";
@@ -58,10 +60,10 @@ export default function InboxSearchFilter() {
     <div className="mb-4 flex items-end justify-between">
       <div className="flex items-center gap-6">
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-gray-500">품목</span>
+          <span className="text-sm font-medium text-gray-500">{t("inbox.filter.item")}</span>
           <FilterDropdown
-            placeholder="품목 선택"
-            searchPlaceholder="품목명 검색"
+            placeholder={t("inbox.filter.item_placeholder")}
+            searchPlaceholder={t("inbox.filter.item_search")}
             options={itemNames ?? []}
             isLoading={isItemNamesPending}
             value={itemName}
@@ -70,10 +72,10 @@ export default function InboxSearchFilter() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-gray-500">공급사</span>
+          <span className="text-sm font-medium text-gray-500">{t("inbox.filter.supplier")}</span>
           <FilterDropdown
-            placeholder="공급사 선택"
-            searchPlaceholder="공급사명 검색"
+            placeholder={t("inbox.filter.supplier_placeholder")}
+            searchPlaceholder={t("inbox.filter.supplier_search")}
             options={supplierNames ?? []}
             isLoading={isSupplierNamesPending}
             value={supplierName}
@@ -82,7 +84,7 @@ export default function InboxSearchFilter() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-gray-500">일시</span>
+          <span className="text-sm font-medium text-gray-500">{t("common.date_time")}</span>
           <ExportDateRangePicker
             range={dateRange}
             onRangeChange={handleDateRangeChange}
@@ -96,7 +98,7 @@ export default function InboxSearchFilter() {
         className="hover:bg-surface-100 flex items-center gap-1.5 rounded border border-gray-200 bg-white px-4 py-2 text-sm text-gray-500 transition-colors"
       >
         <RotateCcw size={14} />
-        필터 초기화
+        {t("common.reset_filter")}
       </button>
     </div>
   );

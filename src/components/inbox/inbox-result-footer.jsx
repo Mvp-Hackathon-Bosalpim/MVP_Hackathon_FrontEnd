@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { formatNumber } from "@/lib/utils";
 import Pagination from "../ui/export-pagination";
 import InboxActionModal from "./inbox-action-modal";
@@ -33,7 +34,7 @@ function InboxResultFooter({
   contentIds,
   onActionSuccess,
 }) {
-  // { type: 'approve' | 'reject' | 'reReview', target: 'bulk' | 'selected' } | null
+  const { t } = useTranslation();
   const [modalState, setModalState] = useState(null);
 
   const bulkApprove = useBulkApprove();
@@ -72,7 +73,7 @@ function InboxResultFooter({
           pageSize={pageSize}
           leftSlot={
             <span className="text-[20px] text-gray-500">
-              총 {formatNumber(totalElements)}건
+              {t("export.total_items", { count: formatNumber(totalElements) })}
             </span>
           }
         />
@@ -84,14 +85,14 @@ function InboxResultFooter({
           onClick={() => openModal("reReview", "bulk")}
           className="text-surface-100 flex w-40 items-center justify-center rounded-sm bg-[#2C5691] p-0 py-3 text-[22px] font-bold"
         >
-          재검토
+          {t("inbox.action.re_review")}
         </button>
         <button
           type="button"
           onClick={() => openModal("approve", "bulk")}
           className="text-surface-100 bg-primary-navy flex w-40 items-center justify-center rounded-sm p-0 py-3 text-[22px] font-bold"
         >
-          일괄 승인
+          {t("inbox.action.bulk_approve")}
         </button>
         <button
           type="button"
@@ -99,14 +100,14 @@ function InboxResultFooter({
           disabled={!hasSelection}
           className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-[22px] disabled:cursor-not-allowed disabled:opacity-40"
         >
-          선택 항목 승인
+          {t("inbox.action.approve_selected")}
         </button>
         <button
           type="button"
           onClick={() => openModal("reject", "bulk")}
           className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-[22px]"
         >
-          일괄 반려
+          {t("inbox.action.bulk_reject")}
         </button>
         <button
           type="button"
@@ -114,7 +115,7 @@ function InboxResultFooter({
           disabled={!hasSelection}
           className="bg-surface-100 border-primary-navy text-primary-navy flex w-40 items-center justify-center rounded-sm border p-0 py-3 text-[22px] disabled:cursor-not-allowed disabled:opacity-40"
         >
-          선택 항목 반려
+          {t("inbox.action.reject_selected")}
         </button>
       </div>
 

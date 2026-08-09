@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import OcrDocumentIcon from "@/assets/icons/ocr-document-icon.svg?react";
 import OcrScanIcon from "@/assets/icons/ocr-scan-icon.svg?react";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
@@ -9,13 +10,6 @@ import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import { cn } from "@/lib/utils";
 import { uploadDocument } from "@/services/api/document";
-
-const UPLOAD_NOTICE = [
-    "원본 행 번호와 파일명을 자동으로 함께 저장합니다.",
-    "필수 필드가 비어 있으면 “확인 필요”로 표시하고 대기 이유를 남깁니다.",
-    '동일 공급사·품목·규격·단가·적용일 조합은 "중복 의심”으로 분류합니다.',
-    "결과를 미리 입력해 두지 않고, 매 업로드마다 새로 판정합니다.",
-];
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv"];
 
@@ -29,7 +23,7 @@ function formatUploadTime(date) {
 }
 
 export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
-    // uploadResult: null | { status: 'success' | 'error', fileName: string }
+    const { t } = useTranslation();
     const [uploadResult, setUploadResult] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -39,7 +33,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
         const uploadedAt = new Date();
 
         if (!ALLOWED_EXTENSIONS.includes(ext)) {
-            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: "지원되지 않는 파일 형식입니다. xlsx 또는 csv 파일만 업로드 가능합니다." });
+            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: t("reg.upload.unsupported_format") });
             return;
         }
 
@@ -49,7 +43,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
             const { total, normal, need_checked } = res.data;
             setUploadResult({ status: "success", fileName: file.name, uploadedAt, total, normal, needChecked: need_checked });
         } catch (err) {
-            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? "업로드에 실패했습니다." });
+            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
         } finally {
             setIsUploading(false);
         }
@@ -65,7 +59,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
         <>
             <div>
                 <h4 className="mb-5 text-[28px] font-bold text-gray-700">
-                    1. 파일 업로드
+                    1. {t("reg.tab.upload")}
                 </h4>
                 <div className="flex items-stretch gap-4">
                     <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} isUploading={isUploading} />
@@ -79,6 +73,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
 }
 
 function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
+    const { t } = useTranslation();
     const [isDragging, setIsDragging] = useState(false);
 
     const handleDragOver = (e) => {
@@ -122,9 +117,9 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
             >
                 <UploadIcon />
                 <p className="text-[28px] font-bold text-gray-700">
-                    {isUploading ? "업로드 중..." : "XLSX 또는 CSV 파일을 이곳에 드래그하세요"}
+                    {isUploading ? t("common.uploading") : t("reg.upload.drag_drop")}
                 </p>
-                <span className="my-1 block text-[20px] text-gray-300">또는</span>
+                <span className="my-1 block text-[20px] text-gray-300">{t("reg.upload.or")}</span>
 
                 <label
                     className={cn(
@@ -132,7 +127,7 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
                         isUploading && "pointer-events-none opacity-50",
                     )}
                 >
-                    파일 선택
+                    {t("reg.upload.select_file")}
                     <input
                         type="file"
                         accept=".xlsx,.csv"
@@ -143,7 +138,7 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
                 </label>
 
                 <span className="text-[20px] text-gray-300">
-                    지원 형식 : xlsx, csv ...
+                    {t("reg.upload.supported_formats")} : xlsx, csv ...
                 </span>
             </div>
 
@@ -155,23 +150,25 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
 }
 
 function OcrFileSelect({ onFileSelected }) {
+    const { t } = useTranslation();
+
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <OcrDocumentIcon className="size-6 text-gray-500" />
                 <div>
                     <p className="text-lg font-bold text-gray-700">
-                        이미지 또는 PDF 파일에서 텍스트 인식
+                        {t("reg.upload.ocr_desc")}
                     </p>
                     <p className="text-xs text-gray-500">
-                        이미지 또는 PDF 파일을 업로드하면 텍스트를 추출하여 수기 등록 폼에 자동 입력합니다.
+                        {t("reg.upload.ocr_desc")}
                     </p>
                 </div>
             </div>
 
             <label className="flex shrink-0 items-center gap-2 rounded-sm border-2 border-gray-100 px-4 py-2 text-sm font-semibold text-gray-500">
                 <OcrScanIcon className="size-6" />
-                파일 선택
+                {t("reg.upload.ocr_select")}
                 <input
                     type="file"
                     accept="image/*,application/pdf"
@@ -184,17 +181,26 @@ function OcrFileSelect({ onFileSelected }) {
 }
 
 function FileNoticeBox() {
+    const { t } = useTranslation();
+
+    const UPLOAD_NOTICE_KEYS = [
+        "reg.upload.check_1",
+        "reg.upload.check_2",
+        "reg.upload.check_3",
+        "reg.upload.check_4",
+    ];
+
     return (
         <div className="flex h-full w-1/3 flex-col rounded-lg border-4 border-primary-gold bg-white px-6 py-8">
             <h4 className="mb-5 text-[28px] font-bold text-gray-700">
-                업로드 전 확인
+                {t("reg.upload.pre_check")}
             </h4>
 
             <ul className="flex flex-col gap-4">
-                {UPLOAD_NOTICE.map((notice, idx) => (
-                    <li key={idx} className="flex items-center gap-3">
+                {UPLOAD_NOTICE_KEYS.map((key) => (
+                    <li key={key} className="flex items-center gap-3">
                         <CheckIcon className="size-6" />
-                        <p className="text-[20px] text-gray-500">{notice}</p>
+                        <p className="text-[20px] text-gray-500">{t(key)}</p>
                     </li>
                 ))}
             </ul>
@@ -203,6 +209,7 @@ function FileNoticeBox() {
 }
 
 function RegisterResultBox({ uploadResult, onRetry }) {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     if (!uploadResult) {
@@ -226,8 +233,8 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                 status === "success" && "text-state-success",
                             )}
                         >
-                            {status === "error" && "업로드 실패"}
-                            {status === "success" && "업로드 성공"}
+                            {status === "error" && t("reg.upload.fail")}
+                            {status === "success" && t("reg.upload.success")}
                         </p>
 
                         <span className="text-[20x] text-gray-300">
@@ -235,7 +242,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                         </span>
                     </div>
 
-                    <span className="text-[20px] text-gray-300">파일명: {fileName ?? "-"}</span>
+                    <span className="text-[20px] text-gray-300">{t("common.file_name")}: {fileName ?? "-"}</span>
 
                     {status === "error" && (
                         <div className="flex items-center justify-between">
@@ -246,7 +253,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                 onClick={onRetry}
                                 className="border-primary-navy rounded-sm border px-4 py-2 text-[24px] text-gray-500"
                             >
-                                다시 시도
+                                {t("common.retry")}
                             </button>
                         </div>
                     )}
@@ -255,33 +262,33 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                         <>
                             <div className="mt-3 rounded-lg border border-gray-100">
                                 <p className="border-b border-gray-100 p-6 text-[24px] font-bold text-gray-500">
-                                    파싱 결과 요약
+                                    {t("reg.upload.parsing_summary")}
                                 </p>
 
                                 <div className="mb-6 flex w-full items-center justify-around py-">
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
-                                        <p>총 건수</p>
+                                        <p>{t("reg.upload.total_count")}</p>
                                         <div>
-                                            <span className="text-[28px] font-bold">{total ?? "-"}</span>건
+                                            <span className="text-[28px] font-bold">{total ?? "-"}</span>{t("common.count_unit")}
                                         </div>
                                     </div>
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
-                                        <p>정상 건수</p>
+                                        <p>{t("reg.upload.normal_count")}</p>
                                         <div>
-                                            <span className="text-[28px] font-bold text-state-success">{normal ?? "-"}</span>건
+                                            <span className="text-[28px] font-bold text-state-success">{normal ?? "-"}</span>{t("common.count_unit")}
                                         </div>
                                     </div>
                                     <div className="flex flex-1 flex-col items-center justify-center gap-2 border-r border-gray-100 py-2 text-[20px]">
-                                        <p>예약 건수</p>
+                                        <p>{t("reg.upload.exception_count")}</p>
                                         <div>
-                                            <span className="text-[28px] font-bold text-state-warning">{needChecked ?? "-"}</span>건
+                                            <span className="text-[28px] font-bold text-state-warning">{needChecked ?? "-"}</span>{t("common.count_unit")}
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <p className="my-3 text-[20px] text-gray-500">
-                                예외/오류 데이터는 인박스에서 확인 및 검수해주세요.
+                                {t("reg.upload.check_inbox_desc")}
                             </p>
 
                             <button
@@ -289,7 +296,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
                                 className="bg-primary-navy flex w-full items-center justify-center gap-4 rounded-lg py-4 transition-opacity hover:opacity-90"
                             >
                                 <span className="text-surface-100 text-[22px] font-bold">
-                                    인박스로 이동
+                                    {t("reg.upload.go_to_inbox")}
                                 </span>
                                 <LineArrowRightIcon />
                             </button>

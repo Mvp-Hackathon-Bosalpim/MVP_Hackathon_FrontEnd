@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import ExportHistoryIcon from "@/assets/icons/export-history-icon.svg?react";
 import ExportHistoryFilterBar from "@/components/ui/export-history-filter-bar";
 import ExportFileTable from "@/components/ui/export-file-table";
 import Pagination from "@/components/ui/export-pagination";
 
-// 마크업 단계: 실제 API 연동 전까지 더미 템플릿을 반복해 목데이터 생성
 const EXPORT_FILE_TEMPLATES = [
   { format: "JSON", count: "1,234", requestedBy: "관리자", status: "완료" },
   { format: "CSV", count: "856", requestedBy: "관리자", status: "완료" },
@@ -40,9 +40,8 @@ function startOfDay(date) {
   ).getTime();
 }
 
-// 일시 필터를 실제로 확인할 수 있도록, 행마다 실제 날짜(20일 구간에 분산)를 부여
 const MOCK_DATE_SPAN = 20;
-const BASE_DATE = new Date(2026, 6, 22); // 2026-07-22
+const BASE_DATE = new Date(2026, 6, 22);
 
 const EXPORT_FILES = Array.from({ length: 62 }, (_, i) => {
   const date = new Date(BASE_DATE);
@@ -64,6 +63,7 @@ const EXPORT_FILES = Array.from({ length: 62 }, (_, i) => {
 const DEFAULT_PAGE_SIZE = 20;
 
 export default function ExportHistoryPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -76,10 +76,8 @@ export default function ExportHistoryPage() {
     const keyword = fileName.trim().toLowerCase();
 
     return EXPORT_FILES.filter((file) => {
-      // 형식 필터
       if (selectedFormat && file.format !== selectedFormat) return false;
 
-      // 일시 필터: 시작~종료일이 모두 선택된 경우에만 날짜 단위로 비교
       if (dateRange.start && dateRange.end) {
         const fileDay = startOfDay(file.date);
         if (
@@ -90,7 +88,6 @@ export default function ExportHistoryPage() {
         }
       }
 
-      // 파일명 검색
       if (keyword && !file.fileName.toLowerCase().includes(keyword))
         return false;
 
@@ -105,7 +102,6 @@ export default function ExportHistoryPage() {
     return filteredFiles.slice(start, start + pageSize);
   }, [filteredFiles, page, pageSize]);
 
-  // 필터/페이지 크기가 바뀌면 1페이지로 되돌아가도록 각 핸들러에서 직접 처리
   const handleFileNameChange = (value) => {
     setFileName(value);
     setPage(1);
@@ -135,18 +131,14 @@ export default function ExportHistoryPage() {
 
   return (
     <div className="mx-auto max-w-[1300px] space-y-5 px-6 py-6">
-      {/* 아이콘 + 제목 + 설명, 돌아가기 버튼 (같은 줄) */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <ExportHistoryIcon className="h-10 w-10 shrink-0" />
           <div>
             <h1 className="text-2xl font-bold text-gray-700">
-              데이터 내보내기 이력
+              {t("history.title")}
             </h1>
-            <p className="text-sm text-gray-500">
-              최근 생성된 JSON/CSV 파일을 조회하고 필요한 파일을 다시 다운로드할
-              수 있습니다.
-            </p>
+            <p className="text-sm text-gray-500">{t("history.desc")}</p>
           </div>
         </div>
 
@@ -156,11 +148,10 @@ export default function ExportHistoryPage() {
           className="bg-surface-0 hover:bg-surface-100 flex items-center gap-1.5 rounded border border-gray-100 px-3 py-2 text-sm text-gray-500 transition-colors"
         >
           <ArrowLeft size={16} />
-          대시보드로 돌아가기
+          {t("history.back_to_dashboard")}
         </button>
       </div>
 
-      {/* 필터 영역 (카드 밖, 한 줄) */}
       <ExportHistoryFilterBar
         fileName={fileName}
         onFileNameChange={handleFileNameChange}
@@ -171,15 +162,10 @@ export default function ExportHistoryPage() {
         onReset={handleFilterReset}
       />
 
-      {/* 데이터 카드 */}
       <div className="border-surface-200 bg-surface-0 overflow-hidden rounded-lg border">
         <div className="px-4 py-3">
           <span className="text-sm text-gray-500">
-            총{" "}
-            <span className="font-bold text-gray-700">
-              {filteredFiles.length}
-            </span>
-            건
+            {t("history.total_count", { count: filteredFiles.length })}
           </span>
         </div>
 
