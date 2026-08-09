@@ -14,7 +14,7 @@ const INBOX_STATUS_BADGE_CONFIG = {
     text: "text-state-gold",
   },
   ON_HOLD: {
-    label: "중복 의심",
+    label: "보류 필요",
     dot: "bg-state-warning",
     text: "text-state-warning",
   },

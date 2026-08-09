@@ -143,3 +143,18 @@ export const updateDocument = async (id, body) => {
   const response = await client.patch(`/api/v1/documents/${id}`, body);
   return response.data;
 };
+
+/**
+ * @param {number} id
+ * @returns {Promise<void>}
+ */
+export const deleteDocument = async (id) => {
+  const response = await client.delete(`/api/v1/documents/${id}`);
+  return response.data;
+};
+
+/** @param {{ ids: number[] }} body @returns {Promise<void>} */
+export const bulkDeleteDocuments = async (body) => {
+  const response = await client.delete("/api/v1/documents", { data: body });
+  return response.data;
+};

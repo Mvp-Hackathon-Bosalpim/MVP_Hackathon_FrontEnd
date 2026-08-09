@@ -182,6 +182,8 @@
     "total_items": "Total {{count}} items",
     "select_format": "Select Format",
     "file_name": "File Name",
+    "file_name_placeholder": "Enter file name.",
+    "confirm": "Export",
     "export_date_time": "Exported At",
     "created_count": "Count",
     "requester": "Requester",
@@ -268,6 +270,7 @@
     "comments": "Comments",
     "no_history": "No records found.",
     "save_draft": "Save as Draft",
+    "delete": "Delete",
     "approve_next": "Approve & Proceed to Next",
     "next_review": "Next Review",
     "approve_confirm": "Approve",
@@ -277,7 +280,14 @@
     "MISSING_REQUIRED": "Some required fields are missing.",
     "DUPLICATE_SUSPECTED": "This item is suspected to be a duplicate. Please review.",
     "SPEC_MISMATCH": "Spec mismatch detected.",
-    "UNIT_MISMATCH": "Unit mismatch detected."
+    "UNIT_MISMATCH": "Unit mismatch detected.",
+    "label": {
+      "DUPLICATE_SUSPECTED": "Duplicate",
+      "UNIT_MISMATCH": "Unit Mismatch",
+      "SPEC_MISMATCH": "Spec Mismatch",
+      "MISSING_REQUIRED": "Missing Required",
+      "approvable": "Approvable"
+    }
   },
   "changelog": {
     "action": {
