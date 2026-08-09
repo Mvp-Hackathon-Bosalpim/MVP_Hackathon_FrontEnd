@@ -7,10 +7,11 @@ function InboxDetailHeader({ data }) {
   const { t } = useTranslation();
 
   const REVIEW_STATUS_MAP = {
-    new: { label: t("inbox.status.new"), className: "text-state-gold" },
-    pending: { label: t("inbox.status.reviewing"), className: "text-state-warning" },
-    approved: { label: t("inbox.status.approved"), className: "text-state-success" },
-    rejected: { label: t("inbox.status.rejected"), className: "text-state-error" },
+    NEW: { label: t("inbox.status.new"), className: "text-state-gold" },
+    NEEDS_REVIEW: { label: t("inbox.status.needs_check"), className: "text-state-warning" },
+    ON_HOLD: { label: t("inbox.status.on_hold"), className: "text-state-warning" },
+    APPROVED: { label: t("inbox.status.approved"), className: "text-state-success" },
+    REJECTED: { label: t("inbox.status.rejected"), className: "text-state-error" },
   };
 
   const {

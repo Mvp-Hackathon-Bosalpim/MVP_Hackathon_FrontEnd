@@ -82,7 +82,7 @@ export default function Header() {
 
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-white" />
-            <span className="text-primary-navy text-base">관리자</span>
+            <span className="text-primary-navy text-base">{t("nav.admin")}</span>
           </div>
         </div>
       </div>

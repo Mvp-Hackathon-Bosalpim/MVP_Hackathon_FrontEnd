@@ -2,6 +2,13 @@ import { cn } from "@/lib/utils";
 import SuccessOutlineIcon from "@/assets/icons/success-outline-icon.svg?react";
 import AlertOutlineIcon from "@/assets/icons/alert-outline-icon.svg?react";
 
+function applyDateMask(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 4) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
+}
+
 const STATE_STYLES = {
   success: {
     wrapper: "border-state-success",
@@ -26,9 +33,14 @@ function getState(value, error) {
   return "idle";
 }
 
-function MappingInput({ value, onChange, placeholder, error }) {
+function MappingInput({ value, onChange, placeholder, error, mask }) {
   const state = getState(value, error);
   const { wrapper, input, Icon } = STATE_STYLES[state];
+
+  const handleChange = (e) => {
+    const raw = e.target.value;
+    onChange(mask === "date" ? applyDateMask(raw) : raw);
+  };
 
   return (
     <div className="flex flex-col gap-1">
@@ -40,8 +52,8 @@ function MappingInput({ value, onChange, placeholder, error }) {
       >
         <input
           value={value ?? ""}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
+          onChange={handleChange}
+          placeholder={mask === "date" ? "YYYY-MM-DD" : placeholder}
           className={cn(
             "flex-1 bg-transparent text-[18px] outline-none",
             input,

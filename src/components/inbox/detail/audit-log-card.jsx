@@ -10,6 +10,21 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
   const [activeTab, setActiveTab] = useState(0);
   const [expanded, setExpanded] = useState(false);
 
+  const FIELD_LABEL_MAP = {
+    normalized_item_name: t("reg.manual.item_name"),
+    supplier_name: t("inbox.filter.supplier"),
+    spec: t("common.spec"),
+    unit: t("common.unit_label"),
+    price_before: t("detail.existing_unit_price"),
+    price_after: t("detail.changed_unit_price"),
+    effective_date: t("inbox.table.applied_date"),
+    review_status: t("common.status"),
+  };
+
+  const getFieldLabel = (field) => FIELD_LABEL_MAP[field] ?? field ?? "-";
+  const getActionLabel = (action) =>
+    action ? t(`changelog.action.${action.toUpperCase()}`, { defaultValue: action }) : "-";
+
   const TABS = [t("detail.change_history"), t("detail.comments")];
   const TABLE_HEADS = [
     t("common.date_time"),
@@ -88,7 +103,7 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
                     {log.actor ?? "-"}
                   </td>
                   <td className="px-6 py-4 text-[18px] text-gray-500">
-                    {log.field_label ?? "-"}
+                    {getFieldLabel(log.field)}
                   </td>
                   <td className="px-6 py-4 text-[18px] text-gray-500">
                     {log.from ?? "-"}
@@ -97,7 +112,7 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
                     {log.to ?? "-"}
                   </td>
                   <td className="px-6 py-4 text-[18px] text-gray-500">
-                    {log.reason ?? "-"}
+                    {getActionLabel(log.action)}
                   </td>
                 </tr>
               ))

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 import { cn, formatNumber } from "@/lib/utils";
 import MappingInput from "./mapping-input";
 
-function MappingEditCard({ data, onSubmit }) {
+const MappingEditCard = forwardRef(function MappingEditCard({ data, exceptionFlags = [], onSubmit }, ref) {
   const { t } = useTranslation();
 
   const MAPPING_FIELDS = [
@@ -34,6 +34,7 @@ function MappingEditCard({ data, onSubmit }) {
       rawKey: "effective_date",
       valueKey: "effective_date",
       required: true,
+      mask: "date",
     },
   ];
 
@@ -53,13 +54,25 @@ function MappingEditCard({ data, onSubmit }) {
     );
   }
 
-  const initialValues = useState(() => initFormValues(data))[0];
+  const [savedValues, setSavedValues] = useState(() => initFormValues(data));
   const [formValues, setFormValues] = useState(() => initFormValues(data));
+
+  // exception_flags → 필드별 경고 메시지 (검증 에러보다 낮은 우선순위)
+  const FLAG_FIELD_MAP = {
+    SPEC_MISMATCH: { valueKey: "spec", message: t("exception.SPEC_MISMATCH") },
+    UNIT_MISMATCH: { valueKey: "unit", message: t("exception.UNIT_MISMATCH") },
+  };
+
+  const flagFieldErrors = exceptionFlags.reduce((acc, flag) => {
+    const mapping = FLAG_FIELD_MAP[flag];
+    if (mapping) acc[mapping.valueKey] = mapping.message;
+    return acc;
+  }, {});
 
   const errors    = validate(formValues);
   const hasErrors = Object.keys(errors).length > 0;
   const isDirty   = MAPPING_FIELDS.some(
-    ({ valueKey }) => String(formValues[valueKey] ?? "") !== String(initialValues[valueKey] ?? ""),
+    ({ valueKey }) => String(formValues[valueKey] ?? "") !== String(savedValues[valueKey] ?? ""),
   );
 
   const handleChange = (key, value) => {
@@ -71,6 +84,13 @@ function MappingEditCard({ data, onSubmit }) {
     if (hasErrors) return;
     onSubmit?.(formValues);
   };
+
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      if (!hasErrors) onSubmit?.(formValues);
+    },
+    resetTo: (values) => setSavedValues(values),
+  }));
 
   return (
     <section className="w-full">
@@ -96,7 +116,7 @@ function MappingEditCard({ data, onSubmit }) {
             </div>
 
             {/* 필드 행 */}
-            {MAPPING_FIELDS.map(({ label, rawKey, valueKey, format }) => {
+            {MAPPING_FIELDS.map(({ label, rawKey, valueKey, format, mask }) => {
               const rawDisplay = format
                 ? (format(data[rawKey]) ?? "-")
                 : (data[rawKey] ?? "-");
@@ -112,10 +132,11 @@ function MappingEditCard({ data, onSubmit }) {
                   <dd className="text-[18px] text-gray-500">{rawDisplay}</dd>
                   <dd>
                     <MappingInput
+                      mask={mask}
                       value={formValues[valueKey]}
                       onChange={(val) => handleChange(valueKey, val)}
                       placeholder={t("detail.please_enter_value", { field: label })}
-                      error={errors[valueKey]}
+                      error={errors[valueKey] ?? flagFieldErrors[valueKey]}
                     />
                   </dd>
                 </div>
@@ -141,6 +162,6 @@ function MappingEditCard({ data, onSubmit }) {
       </div>
     </section>
   );
-}
+});
 
 export default MappingEditCard;
