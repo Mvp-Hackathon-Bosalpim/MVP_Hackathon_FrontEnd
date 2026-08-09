@@ -9,7 +9,7 @@ import ErrorCircleIcon from "@/assets/icons/error-circle-icon.svg?react";
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import { cn } from "@/lib/utils";
-import { uploadDocument } from "@/services/api/document";
+import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv"];
 
@@ -25,9 +25,9 @@ function formatUploadTime(date) {
 export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
     const { t } = useTranslation();
     const [uploadResult, setUploadResult] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
+    const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument();
 
-    const handleFile = async (file) => {
+    const handleFile = (file) => {
         if (!file || isUploading) return;
         const ext = getExtension(file.name);
         const uploadedAt = new Date();
@@ -37,16 +37,15 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
             return;
         }
 
-        setIsUploading(true);
-        try {
-            const res = await uploadDocument(file);
-            const { total, normal, need_checked } = res.data;
-            setUploadResult({ status: "success", fileName: file.name, uploadedAt, total, normal, needChecked: need_checked });
-        } catch (err) {
-            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
-        } finally {
-            setIsUploading(false);
-        }
+        uploadDocument(file, {
+            onSuccess: (res) => {
+                const { total, normal, need_checked } = res.data;
+                setUploadResult({ status: "success", fileName: file.name, uploadedAt, total, normal, needChecked: need_checked });
+            },
+            onError: (err) => {
+                setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
+            },
+        });
     };
 
     useEffect(() => {
