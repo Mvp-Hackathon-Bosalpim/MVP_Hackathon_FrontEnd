@@ -18,7 +18,13 @@
     "unit_label": "Unit",
     "file_name": "File Name",
     "uploading": "Uploading...",
-    "registering": "Registering..."
+    "registering": "Registering...",
+    "reset": "Reset",
+    "loading": "Loading...",
+    "total_count_n": "Total {{count}}",
+    "no_items": "No items",
+    "n_selected": "{{count}} selected",
+    "view_per_page": "View {{count}} per page"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -48,7 +54,13 @@
     "detect_duplicate_data": "Duplicate Data Detected",
     "detect_mismatched_data": "Mismatched Data Detected",
     "review": "Review",
-    "recent_export_history": "Recent Export History"
+    "recent_export_history": "Recent Export History",
+    "total_error_count": "Total Errors",
+    "error_ratio": "{{ratio}}% of total data",
+    "missing_data_label": "Missing Data",
+    "duplicate_data_label": "Suspected Duplicate",
+    "mismatched_data_label": "Spec Mismatch",
+    "unit_mismatch_label": "Unit Mismatch"
   },
   "reg": {
     "title": "Register Proof Data",
@@ -146,6 +158,10 @@
       "re_review_placeholder": "Please enter the reason for re-review.",
       "re_review_confirm": "Re-review"
     },
+    "loading": "Loading data...",
+    "empty_data": "No data registered.",
+    "no_result": "No search results.",
+    "load_error": "Failed to load data.",
     "stats": {
       "total": "Total",
       "pending": "Pending Review",
@@ -165,7 +181,13 @@
     "approved_completed": "Approval Completed",
     "total_items": "Total {{count}} items",
     "select_format": "Select Format",
-    "file_name": "File Name"
+    "file_name": "File Name",
+    "export_date_time": "Exported At",
+    "created_count": "Count",
+    "requester": "Requester",
+    "status_completed": "Completed",
+    "no_data": "No recent data",
+    "format_all": "All Formats"
   },
   "dropdown": {
     "frequent_suppliers": "Frequent Suppliers",
@@ -209,7 +231,10 @@
     "thu": "Thu",
     "fri": "Fri",
     "sat": "Sat",
-    "sun": "Sun"
+    "sun": "Sun",
+    "select_end_date": "Select end date",
+    "day_count": "{{count}} day(s)",
+    "year_month": "{{year}}-{{month}}"
   },
   "detail": {
     "back_to_list": "Back to List",

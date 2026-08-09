@@ -18,7 +18,13 @@
     "unit_label": "단위",
     "file_name": "파일명",
     "uploading": "업로드 중...",
-    "registering": "등록 중..."
+    "registering": "등록 중...",
+    "reset": "초기화",
+    "loading": "불러오는 중...",
+    "total_count_n": "총 {{count}}개",
+    "no_items": "항목 없음",
+    "n_selected": "{{count}}개 선택",
+    "view_per_page": "{{count}}개씩 보기"
   },
   "nav": {
     "dashboard": "대시보드",
@@ -48,7 +54,13 @@
     "detect_duplicate_data": "중복 데이터 탐지",
     "detect_mismatched_data": "불일치 데이터 탐지",
     "review": "검토하기",
-    "recent_export_history": "최근 데이터 내보내기 이력"
+    "recent_export_history": "최근 데이터 내보내기 이력",
+    "total_error_count": "총 오류 건수",
+    "error_ratio": "전체 데이터 중 {{ratio}}%",
+    "missing_data_label": "누락 데이터",
+    "duplicate_data_label": "중복 의심",
+    "mismatched_data_label": "규격 불일치",
+    "unit_mismatch_label": "단위 불일치"
   },
   "reg": {
     "title": "증빙 데이터 등록",
@@ -146,6 +158,10 @@
       "re_review_placeholder": "재검토 사유를 입력해주세요.",
       "re_review_confirm": "재검토"
     },
+    "loading": "데이터를 불러오는 중입니다...",
+    "empty_data": "등록된 데이터가 없습니다.",
+    "no_result": "검색 결과가 없습니다.",
+    "load_error": "데이터를 불러오지 못했습니다.",
     "stats": {
       "total": "전체",
       "pending": "검수 대기",
@@ -165,7 +181,13 @@
     "approved_completed": "승인 완료",
     "total_items": "총 {{count}} 건",
     "select_format": "형식 선택",
-    "file_name": "파일명"
+    "file_name": "파일명",
+    "export_date_time": "내보내기 일시",
+    "created_count": "생성 건수",
+    "requester": "요청자",
+    "status_completed": "완료",
+    "no_data": "최근 데이터가 없습니다",
+    "format_all": "형식 전체"
   },
   "dropdown": {
     "frequent_suppliers": "자주 거래 공급사",
@@ -209,7 +231,10 @@
     "thu": "목",
     "fri": "금",
     "sat": "토",
-    "sun": "일"
+    "sun": "일",
+    "select_end_date": "종료일 선택",
+    "day_count": "{{count}}일",
+    "year_month": "{{year}}년 {{month}}월"
   },
   "detail": {
     "back_to_list": "목록으로 돌아가기",
