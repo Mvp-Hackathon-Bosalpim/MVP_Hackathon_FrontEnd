@@ -37,7 +37,7 @@ function SourceDataCard({ data, onPrev, onNext }) {
           <div className="flex items-center gap-2 text-gray-300">
             <FileOutlineIcon className="size-6" />
             <span className="max-w-50 overflow-clip text-[18px] text-nowrap text-ellipsis">
-              {source_ref.file_name}
+              {source_ref.file_name || t("reg.tab.manual")}
             </span>
           </div>
 
@@ -64,7 +64,9 @@ function SourceDataCard({ data, onPrev, onNext }) {
         {/* 데이터 테이블 */}
         <dl className="flex-1 rounded-md border border-gray-100 bg-white">
           <div className="grid grid-cols-[1fr_1fr] border-b border-gray-100 px-6 py-4">
-            <dt className="text-[18px] font-bold text-gray-500">{t("detail.field_name")}</dt>
+            <dt className="text-[18px] font-bold text-gray-500">
+              {t("detail.field_name")}
+            </dt>
             <dd className="text-[18px] font-bold text-gray-500">
               {t("detail.original_value")}
             </dd>
