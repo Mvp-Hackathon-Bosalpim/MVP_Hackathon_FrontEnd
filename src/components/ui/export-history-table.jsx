@@ -27,7 +27,6 @@ export default function ExportHistoryTable({ records = [] }) {
     t("export.created_count"),
     t("export.requester"),
     t("common.status"),
-    t("common.download"),
   ];
 
   return (
@@ -63,15 +62,6 @@ export default function ExportHistoryTable({ records = [] }) {
                     >
                       {statusLabel}
                     </span>
-                  </td>
-                  <td className="py-5 px-3">
-                    <button
-                      type="button"
-                      onClick={() => {}}
-                      className="text-xs font-medium border border-gray-100 rounded px-3 py-1.5 hover:bg-surface-100 transition-colors"
-                    >
-                      {t("common.download")}
-                    </button>
                   </td>
                 </tr>
               );
