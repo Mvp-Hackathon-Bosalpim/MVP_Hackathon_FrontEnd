@@ -134,7 +134,13 @@
       "purchase_unit_price": "Purchase / Unit Price",
       "changed_unit_price": "Changed Unit Price",
       "applied_date": "Applied Date",
-      "pending_reason": "Pending Reason"
+      "pending_reason": "Pending Reason",
+      "delete_reason": "Delete Reason"
+    },
+    "deleted_list": {
+      "title": "Deleted List",
+      "total": "Total {{count}} items",
+      "empty": "No deleted items."
     },
     "action": {
       "re_review": "Re-review",
@@ -157,7 +163,11 @@
       "re_review_title": "Enter Re-review Reason",
       "re_review_desc": "Enter re-review reason. (500 characters)",
       "re_review_placeholder": "Please enter the reason for re-review.",
-      "re_review_confirm": "Re-review"
+      "re_review_confirm": "Re-review",
+      "delete_title": "Delete Confirmation",
+      "delete_desc": "Please enter the reason for deletion. (30 characters)",
+      "delete_placeholder": "Enter the reason for deletion.",
+      "delete_confirm": "Delete"
     },
     "loading": "Loading data...",
     "empty_data": "No data registered.",
@@ -184,6 +194,7 @@
     "select_format": "Select Format",
     "file_name": "File Name",
     "file_name_placeholder": "Enter file name.",
+    "file_name_hint": "Only Korean, English, numbers, spaces, -, and _ are allowed.",
     "confirm": "Export",
     "export_date_time": "Exported At",
     "created_count": "Count",

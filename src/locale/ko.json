@@ -134,7 +134,13 @@
       "purchase_unit_price": "구매 / 단가",
       "changed_unit_price": "변경단가",
       "applied_date": "적용일",
-      "pending_reason": "대기 이유"
+      "pending_reason": "대기 이유",
+      "delete_reason": "삭제 이유"
+    },
+    "deleted_list": {
+      "title": "삭제 목록",
+      "total": "총 {{count}}건",
+      "empty": "삭제된 항목이 없습니다."
     },
     "action": {
       "re_review": "재검토",
@@ -157,7 +163,11 @@
       "re_review_title": "재검토 사유 입력",
       "re_review_desc": "재검토 사유를 입력해주세요. (500자)",
       "re_review_placeholder": "재검토 사유를 입력해주세요.",
-      "re_review_confirm": "재검토"
+      "re_review_confirm": "재검토",
+      "delete_title": "삭제 확인",
+      "delete_desc": "삭제 사유를 입력해주세요. (30자)",
+      "delete_placeholder": "삭제 사유를 입력해주세요.",
+      "delete_confirm": "삭제"
     },
     "loading": "데이터를 불러오는 중입니다...",
     "empty_data": "등록된 데이터가 없습니다.",
@@ -184,6 +194,7 @@
     "select_format": "형식 선택",
     "file_name": "파일명",
     "file_name_placeholder": "파일명을 입력해주세요.",
+    "file_name_hint": "한글, 영문, 숫자, 공백, -, _ 만 사용할 수 있습니다.",
     "confirm": "내보내기",
     "export_date_time": "내보내기 일시",
     "created_count": "생성 건수",
