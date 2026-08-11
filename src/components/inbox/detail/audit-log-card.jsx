@@ -5,9 +5,8 @@ import { ChevronDownIcon } from "lucide-react";
 
 const INITIAL_SHOW = 3;
 
-function AuditLogCard({ changeLog = [], comments = [] }) {
+function AuditLogCard({ changeLog = [] }) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState(0);
   const [expanded, setExpanded] = useState(false);
 
   const FIELD_LABEL_MAP = {
@@ -25,7 +24,6 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
   const getActionLabel = (action) =>
     action ? t(`changelog.action.${action.toUpperCase()}`, { defaultValue: action }) : "-";
 
-  const TABS = [t("detail.change_history"), t("detail.comments")];
   const TABLE_HEADS = [
     t("common.date_time"),
     t("history.table.modifier"),
@@ -35,10 +33,8 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
     t("history.table.reason"),
   ];
 
-  const tabCounts = [changeLog.length, comments.length];
-  const rows = activeTab === 0 ? changeLog : comments;
-  const visible = expanded ? rows : rows.slice(0, INITIAL_SHOW);
-  const hasMore = rows.length > INITIAL_SHOW;
+  const visible = expanded ? changeLog : changeLog.slice(0, INITIAL_SHOW);
+  const hasMore = changeLog.length > INITIAL_SHOW;
 
   return (
     <section className="mt-6">
@@ -47,28 +43,6 @@ function AuditLogCard({ changeLog = [], comments = [] }) {
       </h2>
 
       <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-        {/* 탭 */}
-        <div className="border-primary-gold flex border-b bg-[#D8D2C5]">
-          {TABS.map((tab, i) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => {
-                setActiveTab(i);
-                setExpanded(false);
-              }}
-              className={cn(
-                "px-6 py-4 text-[18px] font-bold transition-colors",
-                activeTab === i
-                  ? "border-b-2 border-gray-700 text-gray-700"
-                  : "text-gray-400",
-              )}
-            >
-              {tab}({tabCounts[i]})
-            </button>
-          ))}
-        </div>
-
         {/* 테이블 */}
         <table className="w-full">
           <thead>
