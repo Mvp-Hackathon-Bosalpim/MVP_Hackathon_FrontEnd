@@ -11,6 +11,7 @@ const useUpdateDocument = () => {
     mutationFn: ({ id, body }) => updateDocument(id, body),
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: inboxKeys.document(id) });
+      queryClient.invalidateQueries({ queryKey: inboxKeys.all });
     },
   });
 };
