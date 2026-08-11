@@ -60,7 +60,8 @@
     "missing_data_label": "Missing Data",
     "duplicate_data_label": "Suspected Duplicate",
     "mismatched_data_label": "Spec Mismatch",
-    "unit_mismatch_label": "Unit Mismatch"
+    "unit_mismatch_label": "Unit Mismatch",
+    "load_error": "Failed to load data."
   },
   "reg": {
     "title": "Register Proof Data",

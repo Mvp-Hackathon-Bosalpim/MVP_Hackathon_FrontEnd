@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadDocument } from "@/services/api/document";
-import { inboxKeys } from "@/constants/query-keys";
+import { inboxKeys, dashboardKeys } from "@/constants/query-keys";
 
 /**
  * mutate(file: File)
@@ -9,7 +9,10 @@ const useUploadDocument = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (file) => uploadDocument(file),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: inboxKeys.all }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: inboxKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+    },
   });
 };
 
