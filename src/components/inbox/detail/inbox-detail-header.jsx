@@ -3,20 +3,30 @@ import { formatDateTime } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import LeftIcon from "@/assets/icons/left-icon.svg?react";
 
+const REVIEW_STATUS_CLASS = {
+  APPROVED: "text-state-success",
+  REJECTED: "text-state-error",
+  ON_HOLD: "text-state-warning",
+  NEEDS_REVIEW: "text-state-warning",
+  NEW: "text-gray-500",
+};
+
 function InboxDetailHeader({ data }) {
   const { t } = useTranslation();
 
   const {
     doc_id,
     exception_flags,
+    review_status,
     source_ref,
     current_index,
     total,
-    reviewed_at,
     effective_date,
+    change_log,
   } = data;
 
   const flags = exception_flags ?? [];
+  const lastModifiedAt = change_log?.[change_log.length - 1]?.at;
 
   return (
     <>
@@ -38,8 +48,8 @@ function InboxDetailHeader({ data }) {
               {flags.map((f) => t(`exception.label.${f}`, f)).join(", ")}
             </span>
           ) : (
-            <span className="font-bold text-state-success">
-              {t("exception.label.approvable")}
+            <span className={`font-bold ${REVIEW_STATUS_CLASS[review_status] ?? "text-gray-500"}`}>
+              {t(`inbox.status.${review_status?.toLowerCase()}`, review_status ?? "-")}
             </span>
           )}
         </HeaderCell>
@@ -57,14 +67,14 @@ function InboxDetailHeader({ data }) {
           </span>
         </HeaderCell>
 
-        <HeaderCell label={t("detail.created_date")}>
+        <HeaderCell label={t("inbox.table.applied_date")}>
           <span className="text-gray-700">
             {formatDateTime(effective_date)}
           </span>
         </HeaderCell>
 
         <HeaderCell label={t("detail.last_modified")}>
-          <span className="text-gray-700">{formatDateTime(reviewed_at)}</span>
+          <span className="text-gray-700">{formatDateTime(lastModifiedAt)}</span>
         </HeaderCell>
       </div>
     </>
