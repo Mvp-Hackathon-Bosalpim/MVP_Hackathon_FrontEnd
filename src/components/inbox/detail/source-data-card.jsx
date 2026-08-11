@@ -7,7 +7,7 @@ function SourceDataCard({ data, onPrev, onNext }) {
   const { t } = useTranslation();
 
   const FIELDS = [
-    { label: t("reg.manual.item_name"), key: "normalized_item_name" },
+    { label: t("reg.manual.item_name"), key: "raw_item_name" },
     { label: t("common.spec"), key: "spec" },
     { label: t("common.unit_label"), key: "unit" },
     {
