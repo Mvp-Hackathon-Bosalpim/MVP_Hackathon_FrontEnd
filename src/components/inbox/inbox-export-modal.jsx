@@ -121,10 +121,15 @@ function InboxExportModal({ isOpen, onClose }) {
             <input
               type="text"
               value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
+              onChange={(e) =>
+                setFileName(e.target.value.replace(/[^\w\s가-힣ㄱ-ㅎㅏ-ㅣ-]/g, ""))
+              }
               placeholder={t("export.file_name_placeholder")}
               className="w-full rounded border border-gray-200 px-4 py-3 text-base text-gray-700 outline-none placeholder:text-gray-300 focus:border-gray-500"
             />
+            <p className="mt-1.5 text-sm text-gray-300">
+              {t("export.file_name_hint")}
+            </p>
           </div>
         </div>
 
