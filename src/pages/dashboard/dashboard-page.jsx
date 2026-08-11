@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   FileText,
   Clock,
@@ -15,69 +14,73 @@ import PriorityIssueBarChart from "../../components/ui/priority-issue-bar-chart"
 import ExportHistoryTable from "../../components/ui/export-history-table";
 import { useNavigate } from "react-router-dom";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
+import useDashboardSummary from "@/hooks/queries/dashboard/use-dashboard-summary";
+import useIssueStats from "@/hooks/queries/dashboard/use-issue-stats";
 
-const TOTAL_DATA_COUNT = 1000;
+const ISSUE_TYPE_META = [
+  { issue_type: "MISSING_REQUIRED", labelKey: "missing_data_label", color: "state-error" },
+  { issue_type: "DUPLICATE_SUSPECTED", labelKey: "duplicate_data_label", color: "state-warning" },
+  { issue_type: "SPEC_MISMATCH", labelKey: "mismatched_data_label", color: "state-gold" },
+  { issue_type: "UNIT_MISMATCH", labelKey: "unit_mismatch_label", color: "issue-unit" },
+];
 
 export default function DashboardPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const PRIORITY_ISSUES = [
-    {
-      issue_type: "missing_required",
-      label: t("dashboard.missing_data_label"),
-      count: 45,
-      color: "state-error",
-    },
-    {
-      issue_type: "duplicate_suspected",
-      label: t("dashboard.duplicate_data_label"),
-      count: 30,
-      color: "state-warning",
-    },
-    {
-      issue_type: "spec_mismatch",
-      label: t("dashboard.mismatched_data_label"),
-      count: 28,
-      color: "state-gold",
-    },
-    {
-      issue_type: "unit_mismatch",
-      label: t("dashboard.unit_mismatch_label"),
-      count: 20,
-      color: "issue-unit",
-    },
-  ];
+  const { data: summary, isError: isSummaryError } = useDashboardSummary();
+  const { data: issueStats, isError: isIssueStatsError } = useIssueStats();
+
+  const statsByType = new Map(
+    (issueStats?.stats ?? []).map((s) => [s.issue_type, s.count]),
+  );
+  const PRIORITY_ISSUES = ISSUE_TYPE_META.map(({ labelKey, ...meta }) => ({
+    ...meta,
+    label: t(`dashboard.${labelKey}`),
+    count: statsByType.get(meta.issue_type) ?? 0,
+  }));
   const TOTAL_ERROR_COUNT = PRIORITY_ISSUES.reduce(
     (sum, issue) => sum + issue.count,
     0,
   );
-  const navigate = useNavigate();
-  const [exportRecords] = useState([]);
+  const TOTAL_DATA_COUNT = summary?.total?.total_items;
+
+  const exportRecords = (summary?.recent_exports ?? []).map((record, i) => ({
+    id: i,
+    fileName: record.file_name,
+    format: record.format,
+    exportedAt: record.exported_at,
+    count: record.exported_count,
+    requestedBy: "-",
+    status: record.status,
+  }));
 
   const unit = t("common.count_unit");
 
   const OVERVIEW_STATS = [
-    { icon: FileText, label: t("dashboard.total_count"), unit },
-    { icon: SuccessCircleIcon, label: t("dashboard.approved"), unit },
+    { icon: FileText, label: t("dashboard.total_count"), unit, value: summary?.total?.total_items },
+    { icon: SuccessCircleIcon, label: t("dashboard.approved"), unit, value: summary?.total?.approved },
     {
       icon: AlertTriangle,
       label: t("dashboard.exception_error"),
       unit,
       iconColor: "text-primary-gold",
+      value: summary?.total?.exception_detected,
     },
-    { icon: Clock, label: t("dashboard.pending_receipt"), unit },
+    { icon: Clock, label: t("dashboard.pending_receipt"), unit, value: summary?.total?.pending },
   ];
 
   const PRODUCTIVITY_STATS = [
-    { icon: LineChart, label: t("dashboard.total_count"), unit },
-    { icon: SuccessCircleIcon, label: t("dashboard.approved"), unit },
+    { icon: LineChart, label: t("dashboard.total_count"), unit, value: summary?.today?.total_items },
+    { icon: SuccessCircleIcon, label: t("dashboard.approved"), unit, value: summary?.today?.approved },
     {
       icon: AlertTriangle,
       label: t("dashboard.exception_error"),
       unit,
       iconColor: "text-primary-gold",
+      value: summary?.today?.exception_detected,
     },
-    { icon: Clock, label: t("dashboard.pending_receipt"), unit },
+    { icon: Clock, label: t("dashboard.pending_receipt"), unit, value: summary?.today?.pending },
   ];
 
   const handleFileSelect = (file) => {
@@ -100,6 +103,9 @@ export default function DashboardPage() {
         <h2 className="mb-3 text-lg font-bold text-gray-700">
           {t("dashboard.today_productivity")}
         </h2>
+        {isSummaryError && (
+          <p className="mb-3 text-sm text-state-error">{t("dashboard.load_error")}</p>
+        )}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {PRODUCTIVITY_STATS.map((stat) => (
             <StatCard key={stat.label} {...stat} />
@@ -143,6 +149,9 @@ export default function DashboardPage() {
               {t("dashboard.view_all")} <ChevronRight size={16} />
             </button>
           </div>
+          {isIssueStatsError && (
+            <p className="px-4 pt-3 text-sm text-state-error">{t("dashboard.load_error")}</p>
+          )}
           <PriorityIssueBarChart
             issues={PRIORITY_ISSUES}
             totalErrorCount={TOTAL_ERROR_COUNT}
