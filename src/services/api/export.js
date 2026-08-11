@@ -17,6 +17,21 @@ import client from "@/services/instance";
  */
 
 /**
+ * @typedef {Object} PageParams
+ * @property {number} [page]
+ * @property {number} [size]
+ */
+
+/**
+ * @param {PageParams} [params]
+ * @returns {Promise<{ content: ExportHistoryResponseDto[], page: number, size: number, totalElements: number, totalPages: number }>}
+ */
+export const getExportHistory = async (params) => {
+  const response = await client.get("/api/v1/exports", { params });
+  return response.data.data;
+};
+
+/**
  * @param {ExportRequestDto} body
  * @returns {Promise<ExportHistoryResponseDto>}
  */
