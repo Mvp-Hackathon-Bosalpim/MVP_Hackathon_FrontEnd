@@ -9,6 +9,7 @@ import useBulkReject from "@/hooks/mutations/inbox/use-bulk-reject";
 import useBulkReReview from "@/hooks/mutations/inbox/use-bulk-re-review";
 import useBulkDelete from "@/hooks/mutations/inbox/use-bulk-delete";
 import InboxExportModal from "./inbox-export-modal";
+import DeletedItemsModal from "./deleted-items-modal";
 
 /**
  * @typedef {Object} InboxResultFooterProps
@@ -44,6 +45,7 @@ function InboxResultFooter({
   const { t } = useTranslation();
   const [modalState, setModalState] = useState(null);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [deletedModalOpen, setDeletedModalOpen] = useState(false);
 
   const bulkApprove = useBulkApprove();
   const bulkReject = useBulkReject();
@@ -59,6 +61,7 @@ function InboxResultFooter({
       approve: bulkApprove,
       reject: bulkReject,
       reReview: bulkReReview,
+      delete: bulkDelete,
     };
 
     mutationMap[type].mutate(body, {
@@ -67,14 +70,6 @@ function InboxResultFooter({
         setModalState(null);
       },
     });
-  };
-
-  const handleDelete = () => {
-    if (!hasSelection) return;
-    bulkDelete.mutate(
-      { ids: selectedIds },
-      { onSuccess: () => onActionSuccess?.() },
-    );
   };
 
   const openModal = (type, target) => setModalState({ type, target });
@@ -100,12 +95,19 @@ function InboxResultFooter({
               </span>
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => openModal("delete", "selected")}
                 disabled={!hasSelection || bulkDelete.isPending}
                 className="flex items-center gap-2 border border-gray-100 px-4 py-2 text-base disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Trash2 className="size-4" />
                 선택 삭제
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeletedModalOpen(true)}
+                className="flex items-center gap-2 border border-gray-100 px-4 py-2 text-base"
+              >
+                {t("inbox.deleted_list.title")}
               </button>
             </div>
           }
@@ -143,6 +145,11 @@ function InboxResultFooter({
       <InboxExportModal
         isOpen={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
+      />
+
+      <DeletedItemsModal
+        isOpen={deletedModalOpen}
+        onClose={() => setDeletedModalOpen(false)}
       />
 
       <InboxActionModal

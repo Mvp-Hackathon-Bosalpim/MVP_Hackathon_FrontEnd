@@ -10,7 +10,7 @@ import {
 const MAX_MEMO_LENGTH = 500;
 
 /**
- * @typedef {'approve' | 'reject' | 'reReview'} ActionType
+ * @typedef {'approve' | 'reject' | 'reReview' | 'delete'} ActionType
  *
  * @typedef {Object} InboxActionModalProps
  * @property {boolean} isOpen
@@ -50,6 +50,15 @@ export default function InboxActionModal({
       description: t("inbox.modal.re_review_desc"),
       placeholder: t("inbox.modal.re_review_placeholder"),
       confirmLabel: t("inbox.modal.re_review_confirm"),
+    },
+    delete: {
+      title: t("inbox.modal.delete_title"),
+      hasMemo: true,
+      memoRequired: true,
+      maxLength: 30,
+      description: t("inbox.modal.delete_desc"),
+      placeholder: t("inbox.modal.delete_placeholder"),
+      confirmLabel: t("inbox.modal.delete_confirm"),
     },
   };
 
@@ -101,14 +110,14 @@ export default function InboxActionModal({
                 <textarea
                   value={memo}
                   onChange={(e) =>
-                    setMemo(e.target.value.slice(0, MAX_MEMO_LENGTH))
+                    setMemo(e.target.value.slice(0, config.maxLength ?? MAX_MEMO_LENGTH))
                   }
                   placeholder={config.placeholder}
                   rows={8}
                   className="w-full resize-none rounded border border-gray-100 px-4 py-3 text-base text-gray-700 outline-none placeholder:text-gray-300"
                 />
                 <span className="absolute right-4 bottom-3 text-sm text-gray-400">
-                  {memo.length} / {MAX_MEMO_LENGTH}
+                  {memo.length} / {config.maxLength ?? MAX_MEMO_LENGTH}
                 </span>
               </div>
             </>
@@ -131,6 +140,7 @@ export default function InboxActionModal({
           <button
             type="button"
             onClick={handleConfirm}
+            disabled={config.memoRequired && !memo.trim()}
             className="bg-primary-navy flex-1 rounded py-2 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {config.confirmLabel}

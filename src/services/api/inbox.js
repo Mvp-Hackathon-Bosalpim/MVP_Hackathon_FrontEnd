@@ -15,7 +15,7 @@ export const getDocumentStatusCounts = async () => {
   return response.data.data;
 };
 /**
- * @param {{ item_names?: string[], supplier_names?: string[], start_date?: string, end_date?: string }} body
+ * @param {{ item_names?: string[], supplier_names?: string[], start_date?: string, end_date?: string, review_status?: 'NEW'|'NEEDS_REVIEW'|'ON_HOLD'|'APPROVED'|'REJECTED' }} body
  * @param {{ page?: number, size?: number }} params
  * @returns {Promise<PageResponseDto<InboxItemDetailDto>>}
  */
@@ -89,6 +89,7 @@ export const bulkReReview = async (body) => {
  * @property {string} from
  * @property {string} to
  * @property {string} action
+ * @property {string} [memo]
  */
 
 /**
@@ -146,15 +147,46 @@ export const updateDocument = async (id, body) => {
 
 /**
  * @param {number} id
+ * @param {{ memo?: string }} [body]
  * @returns {Promise<void>}
  */
-export const deleteDocument = async (id) => {
-  const response = await client.delete(`/api/v1/documents/${id}`);
+export const deleteDocument = async (id, body) => {
+  const response = await client.delete(`/api/v1/documents/${id}`, { data: body });
   return response.data;
 };
 
-/** @param {{ ids: number[] }} body @returns {Promise<void>} */
+/** @param {{ ids: number[], memo?: string }} body @returns {Promise<void>} */
 export const bulkDeleteDocuments = async (body) => {
   const response = await client.delete("/api/v1/documents", { data: body });
   return response.data;
+};
+
+/**
+ * @typedef {Object} DeletedItemResponseDto
+ * @property {number} id
+ * @property {string} doc_id
+ * @property {'PDF'|'XLSX'|'IMAGE'|'MANUAL'|'CSV'|'UNKNOWN'} source_type
+ * @property {string} supplier_name
+ * @property {string} normalized_item_name
+ * @property {string} spec
+ * @property {number} price_before
+ * @property {number} price_after
+ * @property {string} effective_date
+ * @property {string} [memo]
+ */
+
+/** @returns {Promise<DeletedItemResponseDto[]>} */
+export const getDeletedItems = async () => {
+  const response = await client.get("/api/v1/items/deleted");
+  return response.data.data;
+};
+
+/**
+ * @param {number} id - 중복 그룹 ID
+ * @param {{ page?: number, size?: number }} [params]
+ * @returns {Promise<PageResponseDto<InboxItemDetailDto>>}
+ */
+export const getDuplicateItems = async (id, params) => {
+  const response = await client.get(`/api/v1/documents/duplicate/${id}`, { params });
+  return response.data.data;
 };

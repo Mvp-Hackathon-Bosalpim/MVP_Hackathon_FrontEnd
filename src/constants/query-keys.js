@@ -6,6 +6,7 @@ export const inboxKeys = {
   search: (params) => ["inbox", "search", params],
   supplierNames: () => ["inbox", "supplier-names"],
   normalizedItemNames: () => ["inbox", "normalized-item-names"],
+  deletedItems: () => ["inbox", "deleted-items"],
 };
 
 export const dashboardKeys = {

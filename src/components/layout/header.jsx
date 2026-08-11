@@ -58,11 +58,9 @@ export default function Header() {
         {/* 오른쪽: 언어 선택 + 알림 + 프로필 */}
         <div className="flex h-full items-center gap-4">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-primary-navy flex items-center gap-1.5 rounded-sm border border-gray-100 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50">
-                Lang
-                <ChevronDown size={14} />
-              </button>
+            <DropdownMenuTrigger className="text-primary-navy flex items-center gap-1.5 rounded-sm border border-gray-100 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50">
+              Lang
+              <ChevronDown size={14} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-36 rounded-sm">
               {LANGUAGES.map((lang) => (

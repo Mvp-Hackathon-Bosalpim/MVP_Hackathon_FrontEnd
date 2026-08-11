@@ -72,7 +72,7 @@ function InboxPage() {
 
       <InboxStats className="mb-6" />
 
-      <InboxSearchFilter />
+      <InboxSearchFilter onFilterChange={() => setSelectedIds([])} />
 
       <div>
         <div className="overflow-hidden rounded-lg border border-gray-100 bg-white">

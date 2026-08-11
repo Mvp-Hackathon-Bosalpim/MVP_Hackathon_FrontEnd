@@ -33,7 +33,7 @@ const STATUS_FILTER_CONFIG = [
   },
 ];
 
-export default function InboxSearchFilter() {
+export default function InboxSearchFilter({ onFilterChange }) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: statusCounts } = useDocumentStatusCounts();
@@ -55,6 +55,7 @@ export default function InboxSearchFilter() {
   };
 
   const updateParams = (updates) => {
+    onFilterChange?.();
     setSearchParams((prev) => {
       prev.set("page", 0);
       prev.set("size", 20);
@@ -78,6 +79,7 @@ export default function InboxSearchFilter() {
   };
 
   const handleReset = () => {
+    onFilterChange?.();
     setSearchParams((prev) => {
       [
         "itemName",

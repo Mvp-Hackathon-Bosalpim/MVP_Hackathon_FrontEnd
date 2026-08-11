@@ -25,8 +25,10 @@ function InboxDetailPage() {
   const navigate = useNavigate();
 
   const cardRef = useRef(null);
+  const [approveModalOpen, setApproveModalOpen] = useState(false);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [reReviewModalOpen, setReReviewModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const { data, isPending, isError, refetch } = useDocument(docId);
   const updateMutation = useUpdateDocument();
@@ -43,19 +45,17 @@ function InboxDetailPage() {
       {
         onSuccess: () => {
           cardRef.current?.resetTo(formValues);
-          queryClient.invalidateQueries({
-            queryKey: inboxKeys.document(docId),
-          });
         },
       },
     );
   };
 
-  const handleApprove = () => {
+  const handleApproveConfirm = (memo) => {
     approveMutation.mutate(
-      { id: docId, body: {} },
+      { id: docId, body: { ...(memo && { memo }) } },
       {
         onSuccess: () => {
+          setApproveModalOpen(false);
           if (data?.next_doc_id) {
             navigate(`/inbox/${data.next_doc_id}`);
           } else {
@@ -90,18 +90,22 @@ function InboxDetailPage() {
     );
   };
 
-  const handleDelete = () => {
-    deleteMutation.mutate(Number(docId), {
-      onSuccess: () => {
-        queryClient.removeQueries({ queryKey: inboxKeys.document(docId) });
-        queryClient.invalidateQueries({ queryKey: inboxKeys.all });
-        if (data?.next_doc_id) {
-          navigate(`/inbox/${data.next_doc_id}`);
-        } else {
-          navigate("/inbox");
-        }
+  const handleDeleteConfirm = (memo) => {
+    deleteMutation.mutate(
+      { id: Number(docId), body: { ...(memo && { memo }) } },
+      {
+        onSuccess: () => {
+          setDeleteModalOpen(false);
+          queryClient.removeQueries({ queryKey: inboxKeys.document(docId) });
+          queryClient.invalidateQueries({ queryKey: inboxKeys.all });
+          if (data?.next_doc_id) {
+            navigate(`/inbox/${data.next_doc_id}`);
+          } else {
+            navigate("/inbox");
+          }
+        },
       },
-    });
+    );
   };
 
   const handleReReviewConfirm = (memo) => {
@@ -159,6 +163,7 @@ function InboxDetailPage() {
           onNext={data.next_doc_id ? handleNext : undefined}
         />
         <MappingEditCard
+          key={data.doc_id}
           ref={cardRef}
           data={data}
           exceptionFlags={data.exception_flags ?? []}
@@ -171,7 +176,7 @@ function InboxDetailPage() {
       <div className="flex items-center justify-end gap-4 pt-6">
         <button
           type="button"
-          onClick={handleDelete}
+          onClick={() => setDeleteModalOpen(true)}
           disabled={deleteMutation.isPending}
           className="border-primary-navy text-primary-navy flex items-center gap-3 rounded-md border-2 bg-white px-12 py-2 disabled:opacity-50"
         >
@@ -209,7 +214,7 @@ function InboxDetailPage() {
         ) : (
           <button
             type="button"
-            onClick={handleApprove}
+            onClick={() => setApproveModalOpen(true)}
             disabled={approveMutation.isPending}
             className="border-primary-navy text-surface-100 flex items-center gap-3 rounded-md border-2 bg-gray-500 px-12 py-2 font-bold disabled:opacity-50"
           >
@@ -218,6 +223,20 @@ function InboxDetailPage() {
           </button>
         )}
       </div>
+
+      <InboxActionModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        actionType="delete"
+      />
+
+      <InboxActionModal
+        isOpen={approveModalOpen}
+        onClose={() => setApproveModalOpen(false)}
+        onConfirm={handleApproveConfirm}
+        actionType="approve"
+      />
 
       <InboxActionModal
         isOpen={rejectModalOpen}
