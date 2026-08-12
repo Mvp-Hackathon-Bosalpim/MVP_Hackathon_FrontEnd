@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import LoadingIndicator from "@/assets/loading-indicator.svg?react";
 import AlertCircle from "@/assets/alert-circle.svg?react";
 import { formatExportedAt } from "@/lib/utils";
@@ -20,6 +21,8 @@ function ExportFileRow({ record, t, i18n }) {
   const handleDownload = () => {
     downloadMutation.mutate(record.id, {
       onSuccess: (url) => window.open(url, "_blank"),
+      onError: (error) =>
+        toast.error(error?.response?.data?.message ?? t("export.download_error")),
     });
   };
 
@@ -45,9 +48,6 @@ function ExportFileRow({ record, t, i18n }) {
         >
           {t("common.download")}
         </button>
-        {downloadMutation.isError && (
-          <p className="mt-1 text-xs text-state-error">{t("export.download_error")}</p>
-        )}
       </td>
     </tr>
   );
