@@ -105,9 +105,9 @@ function DeletedItemsModal({ isOpen, onClose }) {
           </button>
         </DialogHeader>
 
-        <div className="overflow-x-auto">
+        <div className="max-h-125 overflow-x-auto">
           <table className="w-full">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-white">
               <tr className="border-b border-gray-100">
                 {TABLE_HEADS.map((head) => (
                   <th
