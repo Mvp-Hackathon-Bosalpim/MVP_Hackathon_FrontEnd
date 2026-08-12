@@ -7,6 +7,7 @@ export const inboxKeys = {
   supplierNames: () => ["inbox", "supplier-names"],
   normalizedItemNames: () => ["inbox", "normalized-item-names"],
   deletedItems: () => ["inbox", "deleted-items"],
+  duplicateGroup: (groupId, params) => ["inbox", "duplicate-group", groupId, params],
 };
 
 export const dashboardKeys = {

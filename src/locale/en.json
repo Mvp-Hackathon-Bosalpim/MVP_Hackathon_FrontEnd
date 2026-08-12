@@ -125,6 +125,7 @@
       "rejected": "Rejected"
     },
     "search_placeholder": "Search supplier or item name",
+    "no_item_name": "Insufficient Data",
     "table": {
       "document": "Document",
       "original": "Original",
@@ -135,7 +136,8 @@
       "changed_unit_price": "Changed Unit Price",
       "applied_date": "Applied Date",
       "pending_reason": "Pending Reason",
-      "delete_reason": "Delete Reason"
+      "delete_reason": "Delete Reason",
+      "not_entered": "Not Entered"
     },
     "deleted_list": {
       "title": "Deleted List",
@@ -284,10 +286,11 @@
     "no_history": "No records found.",
     "save_draft": "Save as Draft",
     "delete": "Delete",
-    "approve_next": "Approve & Proceed to Next",
+    "approve_next": "Approve",
     "next_review": "Next Review",
     "approve_confirm": "Approve",
-    "reject_confirm": "Reject"
+    "reject_confirm": "Reject",
+    "check_duplicate": "Check Duplicate Items"
   },
   "exception": {
     "MISSING_REQUIRED": "Some required fields are missing.",
@@ -319,5 +322,23 @@
     "title": "Enter Rejection Reason",
     "placeholder": "Please enter the reason for rejection.",
     "char_limit": "({{count}} characters)"
+  },
+  "duplication": {
+    "title": "Duplicate Group Detail",
+    "desc": "Check the duplicate item group and detailed information for the selected item.",
+    "current_item": "Current Item",
+    "duplicate_list": "Duplicate Item List",
+    "no": "No.",
+    "source_file": "Source File",
+    "created_at": "Created At",
+    "close": "Close"
+  },
+  "toast": {
+    "delete_success": "Successfully deleted",
+    "approve_success": "Approved",
+    "reject_success": "Rejected",
+    "update_success": "Updated",
+    "re_review_success": "Changed to re-review status",
+    "error_fallback": "An error occurred"
   }
 }

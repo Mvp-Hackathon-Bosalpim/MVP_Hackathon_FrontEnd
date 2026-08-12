@@ -125,6 +125,7 @@
       "rejected": "반려"
     },
     "search_placeholder": "공급사 또는 품목명 검색",
+    "no_item_name": "데이터 부족",
     "table": {
       "document": "문서",
       "original": "원본",
@@ -135,7 +136,8 @@
       "changed_unit_price": "변경단가",
       "applied_date": "적용일",
       "pending_reason": "대기 이유",
-      "delete_reason": "삭제 이유"
+      "delete_reason": "삭제 이유",
+      "not_entered": "미 입력"
     },
     "deleted_list": {
       "title": "삭제 목록",
@@ -284,10 +286,11 @@
     "no_history": "내역이 없습니다.",
     "save_draft": "임시 저장",
     "delete": "삭제",
-    "approve_next": "승인 및 다음건 검수",
+    "approve_next": "승인",
     "next_review": "다음 건 검수",
     "approve_confirm": "승인",
-    "reject_confirm": "반려"
+    "reject_confirm": "반려",
+    "check_duplicate": "중복 품목 확인"
   },
   "exception": {
     "MISSING_REQUIRED": "필수값이 누락된 항목이 있습니다.",
@@ -319,5 +322,23 @@
     "title": "반려 사유 입력",
     "placeholder": "반려하는 사유를 입력해주세요.",
     "char_limit": "({{count}}자)"
+  },
+  "duplication": {
+    "title": "중복 그룹 상세",
+    "desc": "선택된 품목과 중복으로 판단된 품목 그룹 및 상세 정보를 확인합니다.",
+    "current_item": "현재 품목",
+    "duplicate_list": "중복 품목 목록",
+    "no": "번호",
+    "source_file": "원본 파일",
+    "created_at": "생성일",
+    "close": "닫기"
+  },
+  "toast": {
+    "delete_success": "정상적으로 삭제 되었습니다",
+    "approve_success": "승인 되었습니다",
+    "reject_success": "반려 되었습니다",
+    "update_success": "수정 되었습니다",
+    "re_review_success": "재검토 상태로 변경되었습니다",
+    "error_fallback": "오류가 발생했습니다"
   }
 }

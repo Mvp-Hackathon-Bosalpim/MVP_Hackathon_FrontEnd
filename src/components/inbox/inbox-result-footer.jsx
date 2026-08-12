@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import Pagination from "../ui/export-pagination";
 import InboxActionModal from "./inbox-action-modal";
 import { Checkbox } from "../ui/checkbox";
@@ -52,6 +53,13 @@ function InboxResultFooter({
   const bulkReReview = useBulkReReview();
   const bulkDelete = useBulkDelete();
 
+  const BULK_SUCCESS_I18N_KEY = {
+    approve: "toast.approve_success",
+    reject: "toast.reject_success",
+    reReview: "toast.re_review_success",
+    delete: "toast.delete_success",
+  };
+
   const handleConfirm = (memo) => {
     const { type, target } = modalState;
     const ids = target === "selected" ? selectedIds : contentIds;
@@ -66,8 +74,12 @@ function InboxResultFooter({
 
     mutationMap[type].mutate(body, {
       onSuccess: () => {
+        toast.success(t(BULK_SUCCESS_I18N_KEY[type]));
         onActionSuccess?.();
         setModalState(null);
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message ?? t("toast.error_fallback"));
       },
     });
   };

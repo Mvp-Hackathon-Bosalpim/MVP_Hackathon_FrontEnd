@@ -1,29 +1,34 @@
 import { cn, formatNumber } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const INBOX_STATUS_BADGE_CONFIG = {
   NEW: {
-    label: "새 항목",
+    i18nKey: "inbox.status.new",
     dot: "bg-[#31598D]",
     text: "text-[#31598D]",
   },
   NEEDS_REVIEW: {
-    label: "확인 필요",
+    i18nKey: "inbox.status.needs_check",
     dot: "bg-state-gold",
     text: "text-state-gold",
   },
   ON_HOLD: {
-    label: "보류 필요",
+    i18nKey: "inbox.status.on_hold",
     dot: "bg-state-warning",
     text: "text-state-warning",
   },
   APPROVED: {
-    label: "승인",
+    i18nKey: "inbox.status.approved",
     dot: "bg-state-success",
     text: "text-state-success",
   },
-  REJECTED: { label: "반려", dot: "bg-state-error", text: "text-state-error" },
+  REJECTED: {
+    i18nKey: "inbox.status.rejected",
+    dot: "bg-state-error",
+    text: "text-state-error",
+  },
 };
 
 function InboxSourceTypeBadge({ sourceType }) {
@@ -40,17 +45,19 @@ function InboxSourceTypeBadge({ sourceType }) {
 }
 
 function InboxStatusBadge({ reviewStatus }) {
+  const { t } = useTranslation();
   const config = INBOX_STATUS_BADGE_CONFIG[reviewStatus] ?? {
-    label: reviewStatus,
+    i18nKey: null,
     dot: "bg-gray-400",
     text: "text-gray-600",
   };
+  const label = config.i18nKey ? t(config.i18nKey) : (reviewStatus ?? "-");
 
   return (
     <div className="inline-flex items-center gap-2 rounded-full bg-[#DEE1E5] px-4 py-1">
       <span className={cn("size-2.5 rounded-full", config.dot)} />
       <span className={cn("text-[18px] font-bold", config.text)}>
-        {config.label}
+        {label}
       </span>
     </div>
   );
@@ -66,6 +73,7 @@ function InboxStatusBadge({ reviewStatus }) {
 /**@param {InboxRowProps} props */
 function InboxRow({ item, isSelected, onToggle }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <tr
@@ -94,9 +102,15 @@ function InboxRow({ item, isSelected, onToggle }) {
       {/* 품목 */}
       <td className="pl-4">
         <div className="flex flex-col">
-          <span className="text-lg font-bold text-gray-700">
-            {item.normalized_item_name}
-          </span>
+          {item.normalized_item_name ? (
+            <span className="text-lg font-bold text-gray-700">
+              {item.normalized_item_name}
+            </span>
+          ) : (
+            <span className="text-lg font-bold text-state-error">
+              {t("inbox.no_item_name")}
+            </span>
+          )}
           <span className="text-base text-gray-300">{item.raw_item_name}</span>
         </div>
       </td>
@@ -126,7 +140,7 @@ function InboxRow({ item, isSelected, onToggle }) {
         {item.effective_date ? (
           <span className="text-lg text-gray-700">{item.effective_date}</span>
         ) : (
-          <span className="text-xl text-red-500">미 입력</span>
+          <span className="text-lg text-state-error">{t("inbox.table.not_entered")}</span>
         )}
       </td>
 
