@@ -3,18 +3,31 @@ import { useTranslation } from "react-i18next";
 import { cn, formatNumber } from "@/lib/utils";
 import MappingInput from "./mapping-input";
 
-const MappingEditCard = forwardRef(function MappingEditCard({ data, exceptionFlags = [], onSubmit }, ref) {
+const MappingEditCard = forwardRef(function MappingEditCard(
+  { data, exceptionFlags = [], onSubmit },
+  ref,
+) {
   const { t } = useTranslation();
 
   const MAPPING_FIELDS = [
     {
       label: t("reg.manual.item_name"),
-      rawKey: "raw_item_name",
+      rawKey: "normalized_item_name",
       valueKey: "normalized_item_name",
       required: true,
     },
-    { label: t("common.spec"), rawKey: "spec", valueKey: "spec", required: true },
-    { label: t("common.unit_label"), rawKey: "unit", valueKey: "unit", required: true },
+    {
+      label: t("common.spec"),
+      rawKey: "spec",
+      valueKey: "spec",
+      required: true,
+    },
+    {
+      label: t("common.unit_label"),
+      rawKey: "unit",
+      valueKey: "unit",
+      required: true,
+    },
     {
       label: t("detail.existing_unit_price"),
       rawKey: "price_before",
@@ -69,10 +82,12 @@ const MappingEditCard = forwardRef(function MappingEditCard({ data, exceptionFla
     return acc;
   }, {});
 
-  const errors    = validate(formValues);
+  const errors = validate(formValues);
   const hasErrors = Object.keys(errors).length > 0;
-  const isDirty   = MAPPING_FIELDS.some(
-    ({ valueKey }) => String(formValues[valueKey] ?? "") !== String(savedValues[valueKey] ?? ""),
+  const isDirty = MAPPING_FIELDS.some(
+    ({ valueKey }) =>
+      String(formValues[valueKey] ?? "") !==
+      String(savedValues[valueKey] ?? ""),
   );
 
   const handleChange = (key, value) => {
@@ -106,7 +121,9 @@ const MappingEditCard = forwardRef(function MappingEditCard({ data, exceptionFla
           <dl>
             {/* 헤더 행 */}
             <div className="grid grid-cols-[160px_1fr_1fr] border-b border-gray-100 px-6 py-4">
-              <dt className="text-[18px] font-bold text-gray-500">{t("detail.field_name")}</dt>
+              <dt className="text-[18px] font-bold text-gray-500">
+                {t("detail.field_name")}
+              </dt>
               <dd className="text-[18px] font-bold text-gray-500">
                 {t("detail.original_value")}
               </dd>
@@ -135,7 +152,9 @@ const MappingEditCard = forwardRef(function MappingEditCard({ data, exceptionFla
                       mask={mask}
                       value={formValues[valueKey]}
                       onChange={(val) => handleChange(valueKey, val)}
-                      placeholder={t("detail.please_enter_value", { field: label })}
+                      placeholder={t("detail.please_enter_value", {
+                        field: label,
+                      })}
                       error={errors[valueKey] ?? flagFieldErrors[valueKey]}
                     />
                   </dd>
