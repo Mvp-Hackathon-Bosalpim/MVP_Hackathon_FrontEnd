@@ -107,7 +107,7 @@ function DeletedItemsModal({ isOpen, onClose }) {
 
         <div className="max-h-125 overflow-x-auto">
           <table className="w-full">
-            <thead className="sticky top-0 z-10 bg-white">
+            <thead className="sticky top-0 z-10 bg-gray-50">
               <tr className="border-b border-gray-100">
                 {TABLE_HEADS.map((head) => (
                   <th
