@@ -38,7 +38,7 @@ export default function DashboardPage() {
     ...meta,
     label: t(`dashboard.${labelKey}`),
     count: statsByType.get(meta.issue_type) ?? 0,
-  })).sort((a, b) => b.count - a.count);
+  })).sort((a, b) => b.count - a.count || a.issue_type.localeCompare(b.issue_type));
   const TOTAL_ERROR_COUNT = PRIORITY_ISSUES.reduce(
     (sum, issue) => sum + issue.count,
     0,
