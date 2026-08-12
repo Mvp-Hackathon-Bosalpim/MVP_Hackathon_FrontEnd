@@ -33,6 +33,7 @@ export default function InboxActionModal({
     approve: {
       title: t("inbox.modal.approve_title"),
       hasMemo: true,
+      memoRequired: true,
       description: t("inbox.modal.approve_desc"),
       placeholder: t("inbox.modal.approve_placeholder"),
       confirmLabel: t("inbox.modal.approve_confirm"),
@@ -40,6 +41,7 @@ export default function InboxActionModal({
     reject: {
       title: t("inbox.modal.reject_title"),
       hasMemo: true,
+      memoRequired: true,
       description: t("inbox.modal.reject_desc"),
       placeholder: t("inbox.modal.reject_placeholder"),
       confirmLabel: t("inbox.modal.reject_confirm"),
@@ -47,6 +49,7 @@ export default function InboxActionModal({
     reReview: {
       title: t("inbox.modal.re_review_title"),
       hasMemo: true,
+      memoRequired: true,
       description: t("inbox.modal.re_review_desc"),
       placeholder: t("inbox.modal.re_review_placeholder"),
       confirmLabel: t("inbox.modal.re_review_confirm"),
