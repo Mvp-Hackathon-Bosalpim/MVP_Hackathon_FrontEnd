@@ -21,8 +21,6 @@ function AuditLogCard({ changeLog = [] }) {
   };
 
   const getFieldLabel = (field) => FIELD_LABEL_MAP[field] ?? field ?? "-";
-  const getActionLabel = (action) =>
-    action ? t(`changelog.action.${action.toUpperCase()}`, { defaultValue: action }) : "-";
 
   const TABLE_HEADS = [
     t("common.date_time"),
@@ -86,7 +84,7 @@ function AuditLogCard({ changeLog = [] }) {
                     {log.to ?? "-"}
                   </td>
                   <td className="px-6 py-4 text-[18px] text-gray-500">
-                    {getActionLabel(log.action)}
+                    {log.memo ?? "-"}
                   </td>
                 </tr>
               ))
