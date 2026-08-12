@@ -6,61 +6,13 @@ import ExportHistoryIcon from "@/assets/icons/export-history-icon.svg?react";
 import ExportHistoryFilterBar from "@/components/ui/export-history-filter-bar";
 import ExportFileTable from "@/components/ui/export-file-table";
 import Pagination from "@/components/ui/export-pagination";
-
-const EXPORT_FILE_TEMPLATES = [
-  { format: "JSON", count: "1,234", requestedBy: "관리자", status: "완료" },
-  { format: "CSV", count: "856", requestedBy: "관리자", status: "완료" },
-  { format: "JSON", count: "2,048", requestedBy: "시스템", status: "완료" },
-  { format: "CSV", count: "-", requestedBy: "시스템", status: "실패" },
-  { format: "JSON", count: "512", requestedBy: "관리자", status: "완료" },
-  { format: "CSV", count: "-", requestedBy: "시스템", status: "실패" },
-];
-
-function formatDateStamp(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}${m}${d}`;
-}
-
-function formatDateTime(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  const hh = String(date.getHours()).padStart(2, "0");
-  const mm = String(date.getMinutes()).padStart(2, "0");
-  return `${y}-${m}-${d} ${hh}:${mm}:00`;
-}
-
-function startOfDay(date) {
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-  ).getTime();
-}
-
-const MOCK_DATE_SPAN = 20;
-const BASE_DATE = new Date(2026, 6, 22);
-
-const EXPORT_FILES = Array.from({ length: 62 }, (_, i) => {
-  const date = new Date(BASE_DATE);
-  date.setDate(BASE_DATE.getDate() + (i % MOCK_DATE_SPAN));
-  date.setHours(9 + (i % 8), (i * 7) % 60, 0, 0);
-
-  const template = EXPORT_FILE_TEMPLATES[i % EXPORT_FILE_TEMPLATES.length];
-  const ext = template.format.toLowerCase();
-
-  return {
-    id: i + 1,
-    date,
-    exportedAt: formatDateTime(date),
-    fileName: `export_${formatDateStamp(date)}_${i + 1}.${ext}`,
-    ...template,
-  };
-});
+import useExportHistory from "@/hooks/queries/export/use-export-history";
 
 const DEFAULT_PAGE_SIZE = 20;
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+}
 
 export default function ExportHistoryPage() {
   const { t } = useTranslation();
@@ -72,35 +24,38 @@ export default function ExportHistoryPage() {
   const [selectedFormat, setSelectedFormat] = useState(null);
   const [dateRange, setDateRange] = useState({ start: null, end: null });
 
-  const filteredFiles = useMemo(() => {
+  const { data, isPending, isError, refetch } = useExportHistory({
+    page: page - 1,
+    size: pageSize,
+  });
+
+  const totalElements = data?.total_elements ?? 0;
+  const totalPages = Math.max(1, data?.total_pages ?? 1);
+
+  // 백엔드가 필터 파라미터를 지원하지 않아 현재 페이지에 로드된 content 안에서만 필터링
+  const filteredContent = useMemo(() => {
     const keyword = fileName.trim().toLowerCase();
+    const content = data?.content ?? [];
 
-    return EXPORT_FILES.filter((file) => {
-      if (selectedFormat && file.format !== selectedFormat) return false;
+    return content.filter((record) => {
+      if (selectedFormat && record.format !== selectedFormat) return false;
 
-      if (dateRange.start && dateRange.end) {
-        const fileDay = startOfDay(file.date);
+      if (dateRange.start && dateRange.end && record.exported_at) {
+        const recordDay = startOfDay(new Date(record.exported_at));
         if (
-          fileDay < startOfDay(dateRange.start) ||
-          fileDay > startOfDay(dateRange.end)
+          recordDay < startOfDay(dateRange.start) ||
+          recordDay > startOfDay(dateRange.end)
         ) {
           return false;
         }
       }
 
-      if (keyword && !file.fileName.toLowerCase().includes(keyword))
+      if (keyword && !record.file_name?.toLowerCase().includes(keyword))
         return false;
 
       return true;
     });
-  }, [fileName, selectedFormat, dateRange]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredFiles.length / pageSize));
-
-  const visibleFiles = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredFiles.slice(start, start + pageSize);
-  }, [filteredFiles, page, pageSize]);
+  }, [data, fileName, selectedFormat, dateRange]);
 
   const handleFileNameChange = (value) => {
     setFileName(value);
@@ -165,11 +120,16 @@ export default function ExportHistoryPage() {
       <div className="border-surface-200 bg-surface-0 overflow-hidden rounded-lg border">
         <div className="px-4 py-3">
           <span className="text-sm text-gray-500">
-            {t("history.total_count", { count: filteredFiles.length })}
+            {t("history.total_count", { count: totalElements })}
           </span>
         </div>
 
-        <ExportFileTable records={visibleFiles} />
+        <ExportFileTable
+          records={filteredContent}
+          isPending={isPending}
+          isError={isError}
+          onRetry={refetch}
+        />
 
         <Pagination
           currentPage={page}
