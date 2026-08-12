@@ -45,8 +45,8 @@ export default function DashboardPage() {
   );
   const TOTAL_DATA_COUNT = summary?.total?.total_items;
 
-  const exportRecords = (summary?.recent_exports ?? []).map((record, i) => ({
-    id: i,
+  const exportRecords = (summary?.recent_exports ?? []).map((record) => ({
+    id: record.id,
     fileName: record.file_name,
     format: record.format,
     exportedAt: record.exported_at,

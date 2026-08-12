@@ -200,6 +200,7 @@
     "created_count": "Count",
     "requester": "Requester",
     "status_completed": "Completed",
+    "download_error": "Failed to download.",
     "no_data": "No recent data",
     "format_all": "All Formats"
   },
