@@ -38,20 +38,19 @@ export default function DashboardPage() {
     ...meta,
     label: t(`dashboard.${labelKey}`),
     count: statsByType.get(meta.issue_type) ?? 0,
-  }));
+  })).sort((a, b) => b.count - a.count || a.issue_type.localeCompare(b.issue_type));
   const TOTAL_ERROR_COUNT = PRIORITY_ISSUES.reduce(
     (sum, issue) => sum + issue.count,
     0,
   );
   const TOTAL_DATA_COUNT = summary?.total?.total_items;
 
-  const exportRecords = (summary?.recent_exports ?? []).map((record, i) => ({
-    id: i,
+  const exportRecords = (summary?.recent_exports ?? []).map((record) => ({
+    id: record.id,
     fileName: record.file_name,
     format: record.format,
     exportedAt: record.exported_at,
     count: record.exported_count,
-    requestedBy: "-",
     status: record.status,
   }));
 
