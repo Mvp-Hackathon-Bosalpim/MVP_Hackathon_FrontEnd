@@ -14,7 +14,6 @@ export default function ExportHistoryTable({ records = [] }) {
     t("common.format"),
     t("export.export_date_time"),
     t("export.created_count"),
-    t("export.requester"),
     t("common.status"),
     t("common.download"),
   ];
@@ -45,7 +44,6 @@ export default function ExportHistoryTable({ records = [] }) {
                   <td className="py-5 px-3 text-gray-500">{record.format}</td>
                   <td className="py-5 px-3 text-gray-500">{formatExportedAt(record.exportedAt)}</td>
                   <td className="py-5 px-3 text-gray-500">{record.count}</td>
-                  <td className="py-5 px-3 text-gray-500">{record.requestedBy}</td>
                   <td className="py-5 px-3">
                     <span
                       className={`inline-block px-2 py-0.5 rounded text-xs text-white ${STATUS_COLOR[status] ?? "bg-primary-navy"}`}

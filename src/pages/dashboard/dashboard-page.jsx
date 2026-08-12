@@ -51,7 +51,6 @@ export default function DashboardPage() {
     format: record.format,
     exportedAt: record.exported_at,
     count: record.exported_count,
-    requestedBy: "-",
     status: record.status,
   }));
 
