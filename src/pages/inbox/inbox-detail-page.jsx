@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import useDocument from "@/hooks/queries/inbox/use-document";
 import useUpdateDocument from "@/hooks/mutations/inbox/use-update-document";
@@ -45,6 +46,10 @@ function InboxDetailPage() {
       {
         onSuccess: () => {
           cardRef.current?.resetTo(formValues);
+          toast.success(t("toast.update_success"));
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message ?? t("toast.error_fallback"));
         },
       },
     );
@@ -55,12 +60,11 @@ function InboxDetailPage() {
       { id: docId, body: { ...(memo && { memo }) } },
       {
         onSuccess: () => {
+          toast.success(t("toast.approve_success"));
           setApproveModalOpen(false);
-          if (data?.next_doc_id) {
-            navigate(`/inbox/${data.next_doc_id}`);
-          } else {
-            navigate("/inbox");
-          }
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message ?? t("toast.error_fallback"));
         },
       },
     );
@@ -79,12 +83,11 @@ function InboxDetailPage() {
       { id: docId, body: { memo } },
       {
         onSuccess: () => {
+          toast.success(t("toast.reject_success"));
           setRejectModalOpen(false);
-          if (data?.next_doc_id) {
-            navigate(`/inbox/${data.next_doc_id}`);
-          } else {
-            navigate("/inbox");
-          }
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message ?? t("toast.error_fallback"));
         },
       },
     );
@@ -95,6 +98,7 @@ function InboxDetailPage() {
       { id: Number(docId), body: { ...(memo && { memo }) } },
       {
         onSuccess: () => {
+          toast.success(t("toast.delete_success"));
           setDeleteModalOpen(false);
           queryClient.removeQueries({ queryKey: inboxKeys.document(docId) });
           queryClient.invalidateQueries({ queryKey: inboxKeys.all });
@@ -103,6 +107,9 @@ function InboxDetailPage() {
           } else {
             navigate("/inbox");
           }
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message ?? t("toast.error_fallback"));
         },
       },
     );
@@ -113,10 +120,14 @@ function InboxDetailPage() {
       { ids: [Number(docId)], ...(memo && { memo }) },
       {
         onSuccess: () => {
+          toast.success(t("toast.re_review_success"));
           setReReviewModalOpen(false);
           queryClient.invalidateQueries({
             queryKey: inboxKeys.document(docId),
           });
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message ?? t("toast.error_fallback"));
         },
       },
     );
