@@ -1,13 +1,17 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router-dom";
 import { cn, formatNumber } from "@/lib/utils";
 import MappingInput from "./mapping-input";
+import ImagesIcon from "@/assets/icons/images-icon.svg?react";
 
 const MappingEditCard = forwardRef(function MappingEditCard(
   { data, exceptionFlags = [], onSubmit },
   ref,
 ) {
   const { t } = useTranslation();
+  const { docId } = useParams();
+  const isDuplicate = exceptionFlags.includes("DUPLICATE_SUSPECTED");
 
   const MAPPING_FIELDS = [
     {
@@ -109,9 +113,20 @@ const MappingEditCard = forwardRef(function MappingEditCard(
 
   return (
     <section className="w-full">
-      <h2 className="mb-4 text-[20px] font-bold text-gray-700">
-        {t("detail.section_mapping_editing")}
-      </h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-[20px] font-bold text-gray-700">
+          {t("detail.section_mapping_editing")}
+        </h2>
+        {isDuplicate && (
+          <Link
+            to={`/inbox/${docId}/duplication`}
+            className="bg-primary-navy flex items-center gap-2 rounded-md px-4 py-2 text-[18px] font-bold text-white"
+          >
+            <ImagesIcon className="size-5" />
+            {t("detail.check_duplicate")}
+          </Link>
+        )}
+      </div>
 
       <div className="bg-surface-200 rounded-lg border border-gray-100 p-4">
         <form
