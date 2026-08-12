@@ -29,7 +29,6 @@ function ExportFileRow({ record, t, i18n }) {
       <td className="px-3 py-4 text-gray-500">{record.format ?? "-"}</td>
       <td className="px-3 py-4 whitespace-nowrap text-gray-500">{formatExportedAt(record.exported_at)}</td>
       <td className="px-3 py-4 text-gray-500">{record.exported_count ?? "-"}</td>
-      <td className="px-3 py-4 text-gray-500">-</td>
       <td className="px-3 py-4">
         <span
           className={`inline-block rounded px-2 py-0.5 text-xs font-medium text-white ${STATUS_COLOR[status] ?? "bg-primary-navy"}`}
@@ -62,7 +61,6 @@ export default function ExportFileTable({ records = [], isPending = false, isErr
     t("common.format"),
     t("export.export_date_time"),
     t("export.created_count"),
-    t("export.requester"),
     t("common.status"),
     t("common.download"),
   ];
