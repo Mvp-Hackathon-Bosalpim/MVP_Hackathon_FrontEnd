@@ -103,9 +103,6 @@ function FileUploader({ onFileSelected, isUploading }) {
         onFileSelected(file);
     };
 
-    // ponytail: OCR 업로드 API 연동 전까지는 파일 선택만 되고 동작 없음
-    const handleOcrInputChange = () => {};
-
     return (
         <div className="flex h-full w-2/3 flex-col rounded-lg border border-gray-100 bg-white p-4">
             <div
@@ -145,7 +142,7 @@ function FileUploader({ onFileSelected, isUploading }) {
             </div>
 
             <div className="mt-4 border-t border-gray-100 pt-4">
-                <OcrFileSelect onFileSelected={handleOcrInputChange} />
+                <OcrFileSelect onFileSelected={handleInputChange} />
             </div>
         </div>
     );
