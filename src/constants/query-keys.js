@@ -15,3 +15,8 @@ export const dashboardKeys = {
   summary: () => ["dashboard", "summary"],
   issueStats: () => ["dashboard", "issue-stats"],
 };
+
+export const exportKeys = {
+  all: ["exports"],
+  list: (params) => ["exports", "list", params],
+};

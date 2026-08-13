@@ -204,7 +204,8 @@
     "status_completed": "Completed",
     "download_error": "Failed to download.",
     "no_data": "No recent data",
-    "format_all": "All Formats"
+    "format_all": "All Formats",
+    "load_error": "Failed to load data."
   },
   "dropdown": {
     "frequent_suppliers": "Frequent Suppliers",
