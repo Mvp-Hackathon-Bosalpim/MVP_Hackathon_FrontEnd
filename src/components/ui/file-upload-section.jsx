@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
+const OCR_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
 
 function getExtension(fileName) {
     return fileName.split(".").pop().toLowerCase();
@@ -28,25 +29,26 @@ export default function FileUploadSection({ initialFile }) {
     const [uploadResult, setUploadResult] = useState(null);
     const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument();
 
-    const handleFile = (file) => {
+    const handleFile = (file, forcedUploadType) => {
         if (!file || isUploading) return;
         const ext = getExtension(file.name);
+        const uploadType = forcedUploadType ?? (OCR_EXTENSIONS.includes(ext) ? "ocr" : "file");
         const uploadedAt = new Date();
 
         if (!ALLOWED_EXTENSIONS.includes(ext)) {
-            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: t("reg.upload.unsupported_format") });
+            setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, errorMessage: t("reg.upload.unsupported_format") });
             return;
         }
 
-        setUploadResult({ status: "processing", fileName: file.name, uploadedAt, format: ext });
+        setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext });
 
         uploadDocument(file, {
             onSuccess: (res) => {
                 const { total, normal, need_checked } = res.data;
-                setUploadResult({ status: "success", fileName: file.name, uploadedAt, total, normal, needChecked: need_checked });
+                setUploadResult({ status: "success", fileName: file.name, uploadedAt, uploadType, format: ext, total, normal, needChecked: need_checked });
             },
             onError: (err) => {
-                setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
+                setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
             },
         });
     };
@@ -66,8 +68,10 @@ export default function FileUploadSection({ initialFile }) {
                 <div className="flex items-stretch gap-4">
                     {uploadResult?.status === "processing" ? (
                         <ProcessingBox fileName={uploadResult.fileName} format={uploadResult.format} uploadedAt={uploadResult.uploadedAt} />
+                    ) : uploadResult?.status === "success" && uploadResult?.uploadType === "ocr" ? (
+                        <OcrCompleteBox fileName={uploadResult.fileName} format={uploadResult.format} uploadedAt={uploadResult.uploadedAt} />
                     ) : (
-                        <FileUploader onFileSelected={handleFile} isUploading={isUploading} />
+                        <FileUploader onFileSelected={handleFile} onOcrFileSelected={(file) => handleFile(file, "ocr")} isUploading={isUploading} />
                     )}
                     <FileNoticeBox />
                 </div>
@@ -78,7 +82,7 @@ export default function FileUploadSection({ initialFile }) {
     );
 }
 
-function FileUploader({ onFileSelected, isUploading }) {
+function FileUploader({ onFileSelected, onOcrFileSelected, isUploading }) {
     const { t } = useTranslation();
     const [isDragging, setIsDragging] = useState(false);
 
@@ -101,6 +105,11 @@ function FileUploader({ onFileSelected, isUploading }) {
     const handleInputChange = (e) => {
         const file = e.target.files?.[0];
         onFileSelected(file);
+    };
+
+    const handleOcrInputChange = (e) => {
+        const file = e.target.files?.[0];
+        onOcrFileSelected(file);
     };
 
     return (
@@ -142,7 +151,7 @@ function FileUploader({ onFileSelected, isUploading }) {
             </div>
 
             <div className="mt-4 border-t border-gray-100 pt-4">
-                <OcrFileSelect onFileSelected={handleInputChange} />
+                <OcrFileSelect onFileSelected={handleOcrInputChange} />
             </div>
         </div>
     );
@@ -157,6 +166,30 @@ function ProcessingBox({ fileName, format, uploadedAt }) {
             </p>
             <p className="mt-2 text-[20px] text-gray-300">
                 업로드한 파일에서 데이터를 추출하고 있습니다. 잠시만 기다려주세요.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
+                <div className="flex items-center gap-2 text-gray-500">
+                    <FileOutlineIcon className="size-6" />
+                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                </div>
+                <span className="text-nowrap text-[18px] text-gray-300">
+                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                </span>
+            </div>
+        </div>
+    );
+}
+
+function OcrCompleteBox({ fileName, format, uploadedAt }) {
+    return (
+        <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
+            <SuccessCircleIcon className="mb-4 size-12" />
+            <p className="text-primary-navy text-[28px] font-bold">
+                데이터 판별이 완료되었습니다
+            </p>
+            <p className="mt-2 text-[20px] text-gray-300">
+                파일의 데이터를 분석하였습니다
             </p>
 
             <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
