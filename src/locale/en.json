@@ -83,7 +83,7 @@
       "check_3": "Identical supplier-item-spec-price-date combinations are classified as 'Suspected Duplicate'.",
       "check_4": "Results are not pre-entered; they are determined fresh on each upload.",
       "fail": "Upload Failed",
-      "unsupported_format": "Unsupported file format. Only xlsx or csv files can be uploaded.",
+      "unsupported_format": "Unsupported file format. Only xlsx, csv, jpg, png, or pdf files can be uploaded.",
       "success": "Upload Successful",
       "parsing_summary": "Parsing Result Summary",
       "total_count": "Total Count",

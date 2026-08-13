@@ -12,7 +12,7 @@ import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import { cn } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 
-const ALLOWED_EXTENSIONS = ["xlsx", "csv"];
+const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
 
 function getExtension(fileName) {
     return fileName.split(".").pop().toLowerCase();
@@ -23,7 +23,7 @@ function formatUploadTime(date) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
-export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
+export default function FileUploadSection({ initialFile }) {
     const { t } = useTranslation();
     const [uploadResult, setUploadResult] = useState(null);
     const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument();
@@ -67,7 +67,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
                     {uploadResult?.status === "processing" ? (
                         <ProcessingBox fileName={uploadResult.fileName} format={uploadResult.format} uploadedAt={uploadResult.uploadedAt} />
                     ) : (
-                        <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} isUploading={isUploading} />
+                        <FileUploader onFileSelected={handleFile} isUploading={isUploading} />
                     )}
                     <FileNoticeBox />
                 </div>
@@ -78,7 +78,7 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
     );
 }
 
-function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
+function FileUploader({ onFileSelected, isUploading }) {
     const { t } = useTranslation();
     const [isDragging, setIsDragging] = useState(false);
 
@@ -103,12 +103,8 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
         onFileSelected(file);
     };
 
-    const handleOcrInputChange = (e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            onGoToManualEntry?.();
-        }
-    };
+    // ponytail: OCR 업로드 API 연동 전까지는 파일 선택만 되고 동작 없음
+    const handleOcrInputChange = () => {};
 
     return (
         <div className="flex h-full w-2/3 flex-col rounded-lg border border-gray-100 bg-white p-4">
@@ -136,7 +132,7 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
                     {t("reg.upload.select_file")}
                     <input
                         type="file"
-                        accept=".xlsx,.csv"
+                        accept=".xlsx,.csv,.jpg,.jpeg,.png,.pdf"
                         className="hidden"
                         onChange={handleInputChange}
                         disabled={isUploading}
@@ -144,7 +140,7 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
                 </label>
 
                 <span className="text-[20px] text-gray-300">
-                    {t("reg.upload.supported_formats")} : xlsx, csv ...
+                    {t("reg.upload.supported_formats")} : xlsx, csv, jpg, png, pdf ...
                 </span>
             </div>
 

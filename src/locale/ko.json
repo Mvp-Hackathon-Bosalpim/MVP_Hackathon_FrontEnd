@@ -83,7 +83,7 @@
       "check_3": "동일 공급사-품목-규격-단가-적용일 조합은 \"중복 의심\"으로 분류합니다.",
       "check_4": "결과를 미리 입력해 두지 않고, 매 업로드마다 새로 판정합니다.",
       "fail": "업로드 실패",
-      "unsupported_format": "지원되지 않는 파일 형식입니다. xlsx 또는 csv 파일만 업로드 가능합니다.",
+      "unsupported_format": "지원되지 않는 파일 형식입니다. xlsx, csv, jpg, png, pdf 파일만 업로드 가능합니다.",
       "success": "업로드 성공",
       "parsing_summary": "파싱 결과 요약",
       "total_count": "총 건수",
