@@ -8,6 +8,7 @@ import CheckIcon from "@/assets/icons/check-icon.svg?react";
 import ErrorCircleIcon from "@/assets/icons/error-circle-icon.svg?react";
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
+import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import { cn } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 
@@ -19,7 +20,7 @@ function getExtension(fileName) {
 
 function formatUploadTime(date) {
     const pad = (n) => String(n).padStart(2, "0");
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
@@ -36,6 +37,8 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
             setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: t("reg.upload.unsupported_format") });
             return;
         }
+
+        setUploadResult({ status: "processing", fileName: file.name, uploadedAt, format: ext });
 
         uploadDocument(file, {
             onSuccess: (res) => {
@@ -61,7 +64,11 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
                     1. {t("reg.tab.upload")}
                 </h4>
                 <div className="flex items-stretch gap-4">
-                    <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} isUploading={isUploading} />
+                    {uploadResult?.status === "processing" ? (
+                        <ProcessingBox fileName={uploadResult.fileName} format={uploadResult.format} uploadedAt={uploadResult.uploadedAt} />
+                    ) : (
+                        <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} isUploading={isUploading} />
+                    )}
                     <FileNoticeBox />
                 </div>
             </div>
@@ -148,6 +155,30 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
     );
 }
 
+function ProcessingBox({ fileName, format, uploadedAt }) {
+    return (
+        <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
+            <div className="border-primary-navy/20 border-t-primary-navy mb-4 size-12 animate-spin rounded-full border-4" />
+            <p className="text-primary-navy text-[28px] font-bold">
+                데이터 판별 중입니다...
+            </p>
+            <p className="mt-2 text-[20px] text-gray-300">
+                업로드한 파일에서 데이터를 추출하고 있습니다. 잠시만 기다려주세요.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
+                <div className="flex items-center gap-2 text-gray-500">
+                    <FileOutlineIcon className="size-6" />
+                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                </div>
+                <span className="text-nowrap text-[18px] text-gray-300">
+                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                </span>
+            </div>
+        </div>
+    );
+}
+
 function OcrFileSelect({ onFileSelected }) {
     const { t } = useTranslation();
 
@@ -211,7 +242,7 @@ function RegisterResultBox({ uploadResult, onRetry }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    if (!uploadResult) {
+    if (!uploadResult || uploadResult.status === "processing") {
         return null;
     }
 
