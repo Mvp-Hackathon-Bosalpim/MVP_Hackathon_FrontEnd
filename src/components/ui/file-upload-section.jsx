@@ -11,6 +11,7 @@ import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import { cn } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
+import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
 const OCR_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
@@ -27,7 +28,9 @@ function formatUploadTime(date) {
 export default function FileUploadSection({ initialFile }) {
     const { t } = useTranslation();
     const [uploadResult, setUploadResult] = useState(null);
-    const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument();
+    const { mutate: uploadDocument, isPending: isUploadingDocument } = useUploadDocument();
+    const { mutate: previewOcr, isPending: isPreviewingOcr } = usePreviewOcr();
+    const isUploading = isUploadingDocument || isPreviewingOcr;
 
     const handleFile = (file, forcedUploadType) => {
         if (!file || isUploading) return;
@@ -41,6 +44,18 @@ export default function FileUploadSection({ initialFile }) {
         }
 
         setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext });
+
+        if (uploadType === "ocr") {
+            previewOcr(file, {
+                onSuccess: (res) => {
+                    setUploadResult({ status: "success", fileName: file.name, uploadedAt, uploadType, format: ext, ocrItems: res.data });
+                },
+                onError: (err) => {
+                    setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
+                },
+            });
+            return;
+        }
 
         uploadDocument(file, {
             onSuccess: (res) => {
