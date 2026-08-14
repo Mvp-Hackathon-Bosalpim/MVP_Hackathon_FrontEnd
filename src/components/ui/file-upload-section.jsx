@@ -18,6 +18,7 @@ import ConfirmModal from "@/components/ui/confirm-modal";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
 const OCR_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
+const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 
 function getExtension(fileName) {
     return fileName.split(".").pop().toLowerCase();
@@ -47,19 +48,22 @@ export default function FileUploadSection({ initialFile }) {
             return;
         }
 
-        setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext });
-
         if (uploadType === "ocr") {
+            const previewUrl = IMAGE_EXTENSIONS.includes(ext) ? URL.createObjectURL(file) : null;
+            setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext, previewUrl });
+
             previewOcr(file, {
                 onSuccess: (res) => {
-                    setUploadResult({ status: "success", fileName: file.name, uploadedAt, uploadType, format: ext, ocrItems: res.data });
+                    setUploadResult({ status: "success", fileName: file.name, uploadedAt, uploadType, format: ext, previewUrl, ocrItems: res.data });
                 },
                 onError: (err) => {
-                    setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
+                    setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, previewUrl, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
                 },
             });
             return;
         }
+
+        setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext });
 
         uploadDocument(file, {
             onSuccess: (res) => {
@@ -77,6 +81,12 @@ export default function FileUploadSection({ initialFile }) {
             handleFile(initialFile);
         }
     }, [initialFile]);
+
+    useEffect(() => {
+        const url = uploadResult?.previewUrl;
+        if (!url) return;
+        return () => URL.revokeObjectURL(url);
+    }, [uploadResult?.previewUrl]);
 
     const handleConfirmOcr = () => {
         confirmOcr(
@@ -120,7 +130,7 @@ export default function FileUploadSection({ initialFile }) {
 
             {uploadResult?.status === "success" && uploadResult?.uploadType === "ocr" && uploadResult?.ocrItems?.length > 0 && (
                 <>
-                    <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} ocrItems={uploadResult.ocrItems} />
+                    <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} previewUrl={uploadResult.previewUrl} ocrItems={uploadResult.ocrItems} />
 
                     <ConfirmModal
                         isOpen
@@ -130,13 +140,7 @@ export default function FileUploadSection({ initialFile }) {
                         confirmLoadingLabel={t("common.registering")}
                     >
                         <SuccessCircleIcon className="size-6" />
-                        <p className="text-state-success text-xl font-bold">
-                            데이터 판별이 완료되었습니다
-                        </p>
-                        <p className="text-[16px] text-gray-300">
-                            파일의 데이터를 분석하였습니다
-                        </p>
-                        <p className="mt-4 text-lg font-bold text-gray-700">
+                        <p className="mt-2 text-lg font-bold text-gray-700">
                             등록하시겠습니까?
                         </p>
                     </ConfirmModal>
@@ -271,7 +275,7 @@ function OcrCompleteBox({ fileName, format, uploadedAt }) {
     );
 }
 
-function OcrComparisonCard({ fileName, format, ocrItems }) {
+function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
     const COLUMNS = [
         { key: "supplier_name", label: "공급사" },
         { key: "raw_item_name", label: "품목명" },
@@ -282,41 +286,70 @@ function OcrComparisonCard({ fileName, format, ocrItems }) {
         { key: "effective_date", label: "적용일" },
     ];
 
+    const fileInfo = (
+        <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 items-center gap-2 text-gray-500">
+                <FileOutlineIcon className="size-6 shrink-0" />
+                <span className="min-w-0 flex-1 break-words text-[20px]">파일명: {fileName ?? "-"}</span>
+            </div>
+            <span className="text-nowrap text-[18px] text-gray-300">
+                파일 형식: {format ?? "-"}
+            </span>
+        </div>
+    );
+
+    const table = (
+        <table className="min-w-[700px] border-collapse text-[16px]">
+            <thead>
+                <tr className="bg-surface-100 border-b border-gray-100">
+                    {COLUMNS.map(({ key, label }) => (
+                        <th key={key} className="px-2 py-3 text-center font-medium text-gray-500 whitespace-nowrap">
+                            {label}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {ocrItems.map((item, idx) => (
+                    <tr key={idx} className="border-b border-gray-100 last:border-0">
+                        {COLUMNS.map(({ key, format: formatValue }) => (
+                            <td key={key} className="px-2 py-3 text-center text-gray-500 whitespace-nowrap">
+                                {item[key] != null ? (formatValue ? formatValue(item[key]) : item[key]) : "-"}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+
+    if (previewUrl) {
+        return (
+            <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
+                <div className="flex min-w-0 flex-1 flex-col gap-3 border-r border-gray-100 pr-6 text-left">
+                    <img
+                        src={previewUrl}
+                        alt={fileName ?? ""}
+                        className="h-64 w-full rounded-lg border border-gray-100 object-cover"
+                    />
+                    {fileInfo}
+                </div>
+
+                <div className="min-w-0 shrink-0 overflow-x-auto">
+                    {table}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
-            <div className="flex w-1/4 min-w-0 flex-col gap-1 border-r border-gray-100 pr-6 text-left">
-                <div className="flex min-w-0 items-center gap-2 text-gray-500">
-                    <FileOutlineIcon className="size-6 shrink-0" />
-                    <span className="min-w-0 flex-1 break-words text-[20px]">파일명: {fileName ?? "-"}</span>
-                </div>
-                <span className="text-nowrap text-[18px] text-gray-300">
-                    파일 형식: {format ?? "-"}
-                </span>
+            <div className="flex w-1/4 min-w-0 flex-col gap-3 border-r border-gray-100 pr-6 text-left">
+                {fileInfo}
             </div>
 
             <div className="min-w-0 flex-1 overflow-x-auto">
-                <table className="min-w-[700px] border-collapse text-[16px]">
-                    <thead>
-                        <tr className="bg-surface-100 border-b border-gray-100">
-                            {COLUMNS.map(({ key, label }) => (
-                                <th key={key} className="px-2 py-3 text-center font-medium text-gray-500 whitespace-nowrap">
-                                    {label}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ocrItems.map((item, idx) => (
-                            <tr key={idx} className="border-b border-gray-100 last:border-0">
-                                {COLUMNS.map(({ key, format: formatValue }) => (
-                                    <td key={key} className="px-2 py-3 text-center text-gray-500 whitespace-nowrap">
-                                        {item[key] != null ? (formatValue ? formatValue(item[key]) : item[key]) : "-"}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                {table}
             </div>
         </div>
     );
