@@ -237,17 +237,17 @@ function OcrComparisonCard({ fileName, format, ocrItems }) {
 
     return (
         <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
-            <div className="flex w-1/4 shrink-0 flex-col gap-1 border-r border-gray-100 pr-6 text-left">
-                <div className="flex items-center gap-2 text-gray-500">
-                    <FileOutlineIcon className="size-6" />
-                    <span className="break-words text-[20px]">파일명: {fileName ?? "-"}</span>
+            <div className="flex w-1/4 min-w-0 flex-col gap-1 border-r border-gray-100 pr-6 text-left">
+                <div className="flex min-w-0 items-center gap-2 text-gray-500">
+                    <FileOutlineIcon className="size-6 shrink-0" />
+                    <span className="min-w-0 flex-1 break-words text-[20px]">파일명: {fileName ?? "-"}</span>
                 </div>
                 <span className="text-nowrap text-[18px] text-gray-300">
                     파일 형식: {format ?? "-"}
                 </span>
             </div>
 
-            <div className="flex-1 overflow-x-auto">
+            <div className="min-w-0 flex-1 overflow-x-auto">
                 <table className="min-w-[700px] border-collapse text-[16px]">
                     <thead>
                         <tr className="bg-surface-100 border-b border-gray-100">
