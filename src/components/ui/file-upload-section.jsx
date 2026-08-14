@@ -11,6 +11,8 @@ import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import ZoomInIcon from "@/assets/icons/zoom-in-icon.svg?react";
+import DataProcessingIcon from "@/assets/icons/data-processing-icon.svg?react";
+import DataCompleteIcon from "@/assets/icons/data-complete-icon.svg?react";
 import { cn, formatNumber } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
@@ -141,7 +143,7 @@ export default function FileUploadSection({ initialFile }) {
                         isConfirming={isConfirmingOcr}
                         confirmLoadingLabel={t("common.registering")}
                     >
-                        <SuccessCircleIcon className="size-6" />
+                        <DataCompleteIcon className="h-auto w-14" />
                         <p className="mt-2 text-lg font-bold text-gray-700">
                             등록하시겠습니까?
                         </p>
@@ -232,7 +234,7 @@ function FileUploader({ onFileSelected, onOcrFileSelected, isUploading }) {
 function ProcessingBox({ fileName, format, uploadedAt }) {
     return (
         <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
-            <div className="border-primary-navy/20 border-t-primary-navy mb-4 size-12 animate-spin rounded-full border-4" />
+            <DataProcessingIcon className="mb-4 h-auto w-24" />
             <p className="text-primary-navy text-[28px] font-bold">
                 데이터 판별 중입니다...
             </p>
@@ -256,7 +258,7 @@ function ProcessingBox({ fileName, format, uploadedAt }) {
 function OcrCompleteBox({ fileName, format, uploadedAt }) {
     return (
         <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
-            <SuccessCircleIcon className="mb-4 size-12" />
+            <DataCompleteIcon className="mb-4 h-auto w-20" />
             <p className="text-primary-navy text-[28px] font-bold">
                 데이터 판별이 완료되었습니다
             </p>
