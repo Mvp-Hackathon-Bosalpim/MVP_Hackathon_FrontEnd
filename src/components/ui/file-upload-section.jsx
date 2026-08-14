@@ -9,7 +9,7 @@ import ErrorCircleIcon from "@/assets/icons/error-circle-icon.svg?react";
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
-import { cn } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
 
@@ -91,6 +91,10 @@ export default function FileUploadSection({ initialFile }) {
                     <FileNoticeBox />
                 </div>
             </div>
+
+            {uploadResult?.status === "success" && uploadResult?.uploadType === "ocr" && uploadResult?.ocrItems?.length > 0 && (
+                <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} ocrItems={uploadResult.ocrItems} />
+            )}
 
             <RegisterResultBox uploadResult={uploadResult} onRetry={() => setUploadResult(null)} />
         </>
@@ -215,6 +219,57 @@ function OcrCompleteBox({ fileName, format, uploadedAt }) {
                 <span className="text-nowrap text-[18px] text-gray-300">
                     파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
                 </span>
+            </div>
+        </div>
+    );
+}
+
+function OcrComparisonCard({ fileName, format, ocrItems }) {
+    const COLUMNS = [
+        { key: "supplier_name", label: "공급사" },
+        { key: "raw_item_name", label: "품목명" },
+        { key: "spec", label: "규격" },
+        { key: "unit", label: "단위" },
+        { key: "price_before", label: "변경 전 단가", format: formatNumber },
+        { key: "price_after", label: "변경 후 단가", format: formatNumber },
+        { key: "effective_date", label: "적용일" },
+    ];
+
+    return (
+        <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
+            <div className="flex w-1/4 shrink-0 flex-col gap-1 border-r border-gray-100 pr-6 text-left">
+                <div className="flex items-center gap-2 text-gray-500">
+                    <FileOutlineIcon className="size-6" />
+                    <span className="break-words text-[20px]">파일명: {fileName ?? "-"}</span>
+                </div>
+                <span className="text-nowrap text-[18px] text-gray-300">
+                    파일 형식: {format ?? "-"}
+                </span>
+            </div>
+
+            <div className="flex-1 overflow-x-auto">
+                <table className="min-w-[700px] border-collapse text-[16px]">
+                    <thead>
+                        <tr className="bg-surface-100 border-b border-gray-100">
+                            {COLUMNS.map(({ key, label }) => (
+                                <th key={key} className="px-2 py-3 text-center font-medium text-gray-500 whitespace-nowrap">
+                                    {label}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {ocrItems.map((item, idx) => (
+                            <tr key={idx} className="border-b border-gray-100 last:border-0">
+                                {COLUMNS.map(({ key, format: formatValue }) => (
+                                    <td key={key} className="px-2 py-3 text-center text-gray-500 whitespace-nowrap">
+                                        {item[key] != null ? (formatValue ? formatValue(item[key]) : item[key]) : "-"}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
