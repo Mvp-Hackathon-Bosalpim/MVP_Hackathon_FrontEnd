@@ -12,6 +12,7 @@ import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import { cn, formatNumber } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
+import ConfirmModal from "@/components/ui/confirm-modal";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
 const OCR_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
@@ -93,7 +94,22 @@ export default function FileUploadSection({ initialFile }) {
             </div>
 
             {uploadResult?.status === "success" && uploadResult?.uploadType === "ocr" && uploadResult?.ocrItems?.length > 0 && (
-                <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} ocrItems={uploadResult.ocrItems} />
+                <>
+                    <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} ocrItems={uploadResult.ocrItems} />
+
+                    <ConfirmModal isOpen onCancel={() => {}} onConfirm={() => {}}>
+                        <SuccessCircleIcon className="size-6" />
+                        <p className="text-state-success text-xl font-bold">
+                            데이터 판별이 완료되었습니다
+                        </p>
+                        <p className="text-[16px] text-gray-300">
+                            파일의 데이터를 분석하였습니다
+                        </p>
+                        <p className="mt-4 text-lg font-bold text-gray-700">
+                            등록하시겠습니까?
+                        </p>
+                    </ConfirmModal>
+                </>
             )}
 
             <RegisterResultBox uploadResult={uploadResult} onRetry={() => setUploadResult(null)} />
