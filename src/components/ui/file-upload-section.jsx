@@ -29,6 +29,11 @@ export default function FileUploadSection({ initialFile }) {
     const [uploadResult, setUploadResult] = useState(null);
     const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument();
 
+    // TODO: 디버깅용, 확인 끝나면 제거
+    useEffect(() => {
+        console.log("[uploadResult]", { uploadType: uploadResult?.uploadType, status: uploadResult?.status, fileName: uploadResult?.fileName });
+    }, [uploadResult]);
+
     const handleFile = (file, forcedUploadType) => {
         if (!file || isUploading) return;
         const ext = getExtension(file.name);
