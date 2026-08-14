@@ -124,7 +124,7 @@ export default function FileUploadSection({ initialFile }) {
 
                     <ConfirmModal
                         isOpen
-                        onCancel={() => {}}
+                        onCancel={() => setUploadResult(null)}
                         onConfirm={handleConfirmOcr}
                         isConfirming={isConfirmingOcr}
                         confirmLoadingLabel={t("common.registering")}
@@ -386,6 +386,10 @@ function RegisterResultBox({ uploadResult, onRetry }) {
     const navigate = useNavigate();
 
     if (!uploadResult || uploadResult.status === "processing") {
+        return null;
+    }
+
+    if (uploadResult.status === "success" && uploadResult.uploadType === "ocr") {
         return null;
     }
 
