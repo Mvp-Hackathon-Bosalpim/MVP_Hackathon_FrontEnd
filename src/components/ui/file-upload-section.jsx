@@ -10,11 +10,13 @@ import ErrorCircleIcon from "@/assets/icons/error-circle-icon.svg?react";
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
 import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
+import ZoomInIcon from "@/assets/icons/zoom-in-icon.svg?react";
 import { cn, formatNumber } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
 import useConfirmOcr from "@/hooks/mutations/document/use-confirm-ocr";
 import ConfirmModal from "@/components/ui/confirm-modal";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
 const OCR_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
@@ -276,6 +278,8 @@ function OcrCompleteBox({ fileName, format, uploadedAt }) {
 }
 
 function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
+    const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+
     const COLUMNS = [
         { key: "supplier_name", label: "공급사" },
         { key: "raw_item_name", label: "품목명" },
@@ -327,12 +331,32 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
         return (
             <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
                 <div className="flex min-w-0 flex-1 flex-col gap-3 border-r border-gray-100 pr-6 text-left">
-                    <img
-                        src={previewUrl}
-                        alt={fileName ?? ""}
-                        className="h-64 w-full rounded-lg border border-gray-100 object-cover"
-                    />
+                    <div className="relative">
+                        <img
+                            src={previewUrl}
+                            alt={fileName ?? ""}
+                            className="h-64 w-full rounded-lg border border-gray-100 object-cover"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setIsImagePreviewOpen(true)}
+                            className="bg-gray-700/70 absolute top-2 right-2 flex size-8 items-center justify-center rounded-full transition-opacity hover:opacity-90"
+                        >
+                            <ZoomInIcon className="size-5" />
+                        </button>
+                    </div>
                     {fileInfo}
+
+                    <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
+                        <DialogContent className="max-w-[92vw] sm:max-w-[92vw] border-none bg-transparent p-0 shadow-none ring-0">
+                            <DialogTitle className="sr-only">원본 이미지</DialogTitle>
+                            <img
+                                src={previewUrl}
+                                alt={fileName ?? ""}
+                                className="h-[88vh] w-[92vw] rounded-lg object-cover"
+                            />
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 <div className="min-w-0 shrink-0 overflow-x-auto">
