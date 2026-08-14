@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import OcrDocumentIcon from "@/assets/icons/ocr-document-icon.svg?react";
 import OcrScanIcon from "@/assets/icons/ocr-scan-icon.svg?react";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
@@ -12,6 +13,7 @@ import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
 import { cn, formatNumber } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
 import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
+import useConfirmOcr from "@/hooks/mutations/document/use-confirm-ocr";
 import ConfirmModal from "@/components/ui/confirm-modal";
 
 const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
@@ -31,6 +33,7 @@ export default function FileUploadSection({ initialFile }) {
     const [uploadResult, setUploadResult] = useState(null);
     const { mutate: uploadDocument, isPending: isUploadingDocument } = useUploadDocument();
     const { mutate: previewOcr, isPending: isPreviewingOcr } = usePreviewOcr();
+    const { mutate: confirmOcr, isPending: isConfirmingOcr } = useConfirmOcr();
     const isUploading = isUploadingDocument || isPreviewingOcr;
 
     const handleFile = (file, forcedUploadType) => {
@@ -75,6 +78,28 @@ export default function FileUploadSection({ initialFile }) {
         }
     }, [initialFile]);
 
+    const handleConfirmOcr = () => {
+        confirmOcr(
+            { filename: uploadResult?.fileName, ocrItems: uploadResult?.ocrItems },
+            {
+                onSuccess: (res) => {
+                    const { total, normal, need_checked } = res.data;
+                    setUploadResult({
+                        status: "success",
+                        uploadType: "file",
+                        fileName: uploadResult?.fileName,
+                        uploadedAt: new Date(),
+                        format: uploadResult?.format,
+                        total, normal, needChecked: need_checked,
+                    });
+                },
+                onError: (err) => {
+                    toast.error(err.response?.data?.message ?? t("toast.error_fallback"));
+                },
+            },
+        );
+    };
+
     return (
         <>
             <div>
@@ -97,7 +122,13 @@ export default function FileUploadSection({ initialFile }) {
                 <>
                     <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} ocrItems={uploadResult.ocrItems} />
 
-                    <ConfirmModal isOpen onCancel={() => {}} onConfirm={() => {}}>
+                    <ConfirmModal
+                        isOpen
+                        onCancel={() => {}}
+                        onConfirm={handleConfirmOcr}
+                        isConfirming={isConfirmingOcr}
+                        confirmLoadingLabel={t("common.registering")}
+                    >
                         <SuccessCircleIcon className="size-6" />
                         <p className="text-state-success text-xl font-bold">
                             데이터 판별이 완료되었습니다

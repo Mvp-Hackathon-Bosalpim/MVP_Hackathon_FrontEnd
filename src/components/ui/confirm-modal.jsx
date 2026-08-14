@@ -4,6 +4,8 @@ export default function ConfirmModal({
     onConfirm,
     cancelLabel = "취소",
     confirmLabel = "등록하기",
+    confirmLoadingLabel = confirmLabel,
+    isConfirming = false,
     children,
 }) {
     if (!isOpen) return null;
@@ -18,16 +20,18 @@ export default function ConfirmModal({
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 rounded border border-gray-200 py-2 text-base text-gray-500 transition-colors hover:bg-gray-50"
+                    disabled={isConfirming}
+                    className="flex-1 rounded border border-gray-200 py-2 text-base text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {cancelLabel}
                 </button>
                 <button
                     type="button"
                     onClick={onConfirm}
-                    className="bg-primary-navy flex-1 rounded py-2 text-base font-bold text-white transition-opacity hover:opacity-90"
+                    disabled={isConfirming}
+                    className="bg-primary-navy flex-1 rounded py-2 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    {confirmLabel}
+                    {isConfirming ? confirmLoadingLabel : confirmLabel}
                 </button>
             </div>
         </div>
