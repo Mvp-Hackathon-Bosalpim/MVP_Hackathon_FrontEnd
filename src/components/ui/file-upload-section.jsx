@@ -145,7 +145,7 @@ export default function FileUploadSection({ initialFile }) {
                     >
                         <DataCompleteIcon className="h-auto w-14" />
                         <p className="mt-2 text-lg font-bold text-gray-700">
-                            등록하시겠습니까?
+                            {t("reg.upload.confirm_register")}
                         </p>
                     </ConfirmModal>
                 </>
@@ -232,23 +232,24 @@ function FileUploader({ onFileSelected, onOcrFileSelected, isUploading }) {
 }
 
 function ProcessingBox({ fileName, format, uploadedAt }) {
+    const { t } = useTranslation();
     return (
         <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
             <DataProcessingIcon className="mb-4 h-auto w-24" />
             <p className="text-primary-navy text-[28px] font-bold">
-                데이터 판별 중입니다...
+                {t("reg.upload.processing_title")}
             </p>
             <p className="mt-2 text-[20px] text-gray-300">
-                업로드한 파일에서 데이터를 추출하고 있습니다. 잠시만 기다려주세요.
+                {t("reg.upload.processing_desc")}
             </p>
 
             <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
                 <div className="flex items-center gap-2 text-gray-500">
                     <FileOutlineIcon className="size-6" />
-                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                    <span className="text-nowrap text-[20px]">{t("common.file_name")}: {fileName ?? "-"}</span>
                 </div>
                 <span className="text-nowrap text-[18px] text-gray-300">
-                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                    {t("reg.upload.file_format")}: {format ?? "-"} · {t("reg.upload.upload_time")}: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
                 </span>
             </div>
         </div>
@@ -256,23 +257,24 @@ function ProcessingBox({ fileName, format, uploadedAt }) {
 }
 
 function OcrCompleteBox({ fileName, format, uploadedAt }) {
+    const { t } = useTranslation();
     return (
         <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
             <DataCompleteIcon className="mb-4 h-auto w-20" />
             <p className="text-primary-navy text-[28px] font-bold">
-                데이터 판별이 완료되었습니다
+                {t("reg.upload.complete_title")}
             </p>
             <p className="mt-2 text-[20px] text-gray-300">
-                파일의 데이터를 분석하였습니다
+                {t("reg.upload.complete_desc")}
             </p>
 
             <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
                 <div className="flex items-center gap-2 text-gray-500">
                     <FileOutlineIcon className="size-6" />
-                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                    <span className="text-nowrap text-[20px]">{t("common.file_name")}: {fileName ?? "-"}</span>
                 </div>
                 <span className="text-nowrap text-[18px] text-gray-300">
-                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                    {t("reg.upload.file_format")}: {format ?? "-"} · {t("reg.upload.upload_time")}: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
                 </span>
             </div>
         </div>
@@ -285,6 +287,7 @@ const ZOOM_STEP = 0.2;
 const DOUBLE_CLICK_ZOOM = 2;
 
 function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
+    const { t } = useTranslation();
     const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
     const [zoom, setZoom] = useState(ZOOM_MIN);
     const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -364,23 +367,23 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
     const handleMouseUp = () => setIsDragging(false);
 
     const COLUMNS = [
-        { key: "supplier_name", label: "공급사" },
-        { key: "raw_item_name", label: "품목명" },
-        { key: "spec", label: "규격" },
-        { key: "unit", label: "단위" },
-        { key: "price_before", label: "변경 전 단가", format: formatNumber },
-        { key: "price_after", label: "변경 후 단가", format: formatNumber },
-        { key: "effective_date", label: "적용일" },
+        { key: "supplier_name", label: t("reg.upload.col_supplier") },
+        { key: "raw_item_name", label: t("reg.upload.col_item_name") },
+        { key: "spec", label: t("reg.upload.col_spec") },
+        { key: "unit", label: t("reg.upload.col_unit") },
+        { key: "price_before", label: t("reg.upload.col_price_before"), format: formatNumber },
+        { key: "price_after", label: t("reg.upload.col_price_after"), format: formatNumber },
+        { key: "effective_date", label: t("reg.upload.col_applied_date") },
     ];
 
     const fileInfo = (
         <div className="flex flex-col gap-1">
             <div className="flex min-w-0 items-center gap-2 text-gray-500">
                 <FileOutlineIcon className="size-6 shrink-0" />
-                <span className="min-w-0 flex-1 break-words text-[20px]">파일명: {fileName ?? "-"}</span>
+                <span className="min-w-0 flex-1 break-words text-[20px]">{t("common.file_name")}: {fileName ?? "-"}</span>
             </div>
             <span className="text-nowrap text-[18px] text-gray-300">
-                파일 형식: {format ?? "-"}
+                {t("reg.upload.file_format")}: {format ?? "-"}
             </span>
         </div>
     );
@@ -432,7 +435,7 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
 
                     <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
                         <DialogContent className="max-w-[97vw] sm:max-w-[97vw] border-none bg-transparent p-0 shadow-none ring-0">
-                            <DialogTitle className="sr-only">원본 이미지</DialogTitle>
+                            <DialogTitle className="sr-only">{t("reg.upload.original_image")}</DialogTitle>
                             <div
                                 className="relative mx-auto w-fit max-h-[96vh] max-w-[97vw] overflow-hidden rounded-lg"
                                 onWheel={handleWheel}
@@ -465,7 +468,7 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
                                         onClick={resetZoom}
                                         className="bg-gray-700/70 text-surface-0 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-medium"
                                     >
-                                        원래 크기로
+                                        {t("reg.upload.reset_zoom")}
                                     </button>
                                 )}
                             </div>

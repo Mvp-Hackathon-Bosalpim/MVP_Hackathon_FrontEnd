@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 function NotFoundPage() {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
       <h1 className="text-4xl font-bold">404</h1>
-      <p className="text-lg">페이지를 찾을 수 없습니다.</p>
+      <p className="text-lg">{t('not_found.message')}</p>
       <Link to="/" className="text-blue-500 underline">
-        홈으로 돌아가기
+        {t('not_found.back_home')}
       </Link>
     </div>
   )

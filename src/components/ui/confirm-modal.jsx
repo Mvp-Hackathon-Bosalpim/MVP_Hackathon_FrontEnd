@@ -1,14 +1,21 @@
+import { useTranslation } from "react-i18next";
+
 export default function ConfirmModal({
     isOpen,
     onCancel,
     onConfirm,
-    cancelLabel = "취소",
-    confirmLabel = "등록하기",
-    confirmLoadingLabel = confirmLabel,
+    cancelLabel,
+    confirmLabel,
+    confirmLoadingLabel,
     isConfirming = false,
     children,
 }) {
+    const { t } = useTranslation();
     if (!isOpen) return null;
+
+    const resolvedCancelLabel = cancelLabel ?? t("common.cancel");
+    const resolvedConfirmLabel = confirmLabel ?? t("reg.manual.register");
+    const resolvedConfirmLoadingLabel = confirmLoadingLabel ?? resolvedConfirmLabel;
 
     return (
         <div className="my-8 rounded-lg border border-gray-100 bg-white p-7">
@@ -23,7 +30,7 @@ export default function ConfirmModal({
                     disabled={isConfirming}
                     className="flex-1 rounded border border-gray-200 py-2 text-base text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    {cancelLabel}
+                    {resolvedCancelLabel}
                 </button>
                 <button
                     type="button"
@@ -31,7 +38,7 @@ export default function ConfirmModal({
                     disabled={isConfirming}
                     className="bg-primary-navy flex-1 rounded py-2 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    {isConfirming ? confirmLoadingLabel : confirmLabel}
+                    {isConfirming ? resolvedConfirmLoadingLabel : resolvedConfirmLabel}
                 </button>
             </div>
         </div>
