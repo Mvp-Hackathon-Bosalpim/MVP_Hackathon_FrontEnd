@@ -71,7 +71,7 @@
       "manual": "수기 등록"
     },
     "upload": {
-      "drag_drop": "XLSX 또는 CSV 파일을 이곳에 드래그하세요",
+      "drag_drop": "파일을 이곳에 드래그하세요",
       "or": "또는",
       "select_file": "파일 선택",
       "supported_formats": "지원 형식",
@@ -235,6 +235,7 @@
       "change_item": "변경 항목",
       "before_change": "변경 전",
       "after_change": "변경 후",
+      "action_result": "처리 결과",
       "reason": "사유"
     }
   },

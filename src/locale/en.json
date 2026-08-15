@@ -71,7 +71,7 @@
       "manual": "Manual Registration"
     },
     "upload": {
-      "drag_drop": "Drag and drop XLSX or CSV files here",
+      "drag_drop": "Drag and drop files here",
       "or": "or",
       "select_file": "Select File",
       "supported_formats": "Supported formats",
@@ -235,6 +235,7 @@
       "change_item": "Change Item",
       "before_change": "Before Change",
       "after_change": "After Change",
+      "action_result": "Action Result",
       "reason": "Reason"
     }
   },
