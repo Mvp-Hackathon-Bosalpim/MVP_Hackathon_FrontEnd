@@ -301,6 +301,15 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
         }
     }, [isImagePreviewOpen]);
 
+    useEffect(() => {
+        if (!isImagePreviewOpen) return;
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") setIsImagePreviewOpen(false);
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isImagePreviewOpen]);
+
     const handleLightboxImgLoad = (e) => {
         const { naturalWidth, naturalHeight } = e.target;
         if (!naturalWidth || !naturalHeight) return;
