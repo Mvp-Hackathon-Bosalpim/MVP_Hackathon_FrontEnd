@@ -1,8 +1,9 @@
 import client from "@/services/instance";
 
-/** @param {PageParams} [params] @returns {Promise<ApiResponse<PageResponseDto>} */
-
-/** @returns {Promise<PageResponseDto<InboxItemDetailDto>} */
+/**
+ * @param {PageParams} [params]
+ * @returns {Promise<PageResponseDto<InboxItemDetailDto>>}
+ */
 export const getDocuments = async (params) => {
   const response = await client.get("/api/v1/documents", { params });
   return response.data.data;
