@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import OcrDocumentIcon from "@/assets/icons/ocr-document-icon.svg?react";
 import OcrScanIcon from "@/assets/icons/ocr-scan-icon.svg?react";
 import UploadIcon from "@/assets/icons/upload-icon.svg?react";
@@ -8,10 +9,20 @@ import CheckIcon from "@/assets/icons/check-icon.svg?react";
 import ErrorCircleIcon from "@/assets/icons/error-circle-icon.svg?react";
 import SuccessCircleIcon from "@/assets/icons/success-circle-icon.svg?react";
 import LineArrowRightIcon from "@/assets/icons/line-arrow-right-icon.svg?react";
-import { cn } from "@/lib/utils";
+import FileOutlineIcon from "@/assets/icons/file-outline-icon.svg?react";
+import ZoomInIcon from "@/assets/icons/zoom-in-icon.svg?react";
+import DataProcessingIcon from "@/assets/icons/data-processing-icon.svg?react";
+import DataCompleteIcon from "@/assets/icons/data-complete-icon.svg?react";
+import { cn, formatNumber } from "@/lib/utils";
 import useUploadDocument from "@/hooks/mutations/document/use-upload-document";
+import usePreviewOcr from "@/hooks/mutations/document/use-preview-ocr";
+import useConfirmOcr from "@/hooks/mutations/document/use-confirm-ocr";
+import ConfirmModal from "@/components/ui/confirm-modal";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
-const ALLOWED_EXTENSIONS = ["xlsx", "csv"];
+const ALLOWED_EXTENSIONS = ["xlsx", "csv", "jpg", "jpeg", "png", "pdf"];
+const OCR_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
+const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 
 function getExtension(fileName) {
     return fileName.split(".").pop().toLowerCase();
@@ -19,31 +30,52 @@ function getExtension(fileName) {
 
 function formatUploadTime(date) {
     const pad = (n) => String(n).padStart(2, "0");
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
-export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
+export default function FileUploadSection({ initialFile }) {
     const { t } = useTranslation();
     const [uploadResult, setUploadResult] = useState(null);
-    const { mutate: uploadDocument, isPending: isUploading } = useUploadDocument();
+    const { mutate: uploadDocument, isPending: isUploadingDocument } = useUploadDocument();
+    const { mutate: previewOcr, isPending: isPreviewingOcr } = usePreviewOcr();
+    const { mutate: confirmOcr, isPending: isConfirmingOcr } = useConfirmOcr();
+    const isUploading = isUploadingDocument || isPreviewingOcr;
 
-    const handleFile = (file) => {
+    const handleFile = (file, forcedUploadType) => {
         if (!file || isUploading) return;
         const ext = getExtension(file.name);
+        const uploadType = forcedUploadType ?? (OCR_EXTENSIONS.includes(ext) ? "ocr" : "file");
         const uploadedAt = new Date();
 
         if (!ALLOWED_EXTENSIONS.includes(ext)) {
-            setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: t("reg.upload.unsupported_format") });
+            setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, errorMessage: t("reg.upload.unsupported_format") });
             return;
         }
+
+        if (uploadType === "ocr") {
+            const previewUrl = IMAGE_EXTENSIONS.includes(ext) ? URL.createObjectURL(file) : null;
+            setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext, previewUrl });
+
+            previewOcr(file, {
+                onSuccess: (res) => {
+                    setUploadResult({ status: "success", fileName: file.name, uploadedAt, uploadType, format: ext, previewUrl, ocrItems: res.data });
+                },
+                onError: (err) => {
+                    setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, previewUrl, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
+                },
+            });
+            return;
+        }
+
+        setUploadResult({ status: "processing", fileName: file.name, uploadedAt, uploadType, format: ext });
 
         uploadDocument(file, {
             onSuccess: (res) => {
                 const { total, normal, need_checked } = res.data;
-                setUploadResult({ status: "success", fileName: file.name, uploadedAt, total, normal, needChecked: need_checked });
+                setUploadResult({ status: "success", fileName: file.name, uploadedAt, uploadType, format: ext, total, normal, needChecked: need_checked });
             },
             onError: (err) => {
-                setUploadResult({ status: "error", fileName: file.name, uploadedAt, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
+                setUploadResult({ status: "error", fileName: file.name, uploadedAt, uploadType, errorMessage: err.response?.data?.message ?? t("reg.upload.upload_failed_default") });
             },
         });
     };
@@ -54,6 +86,34 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
         }
     }, [initialFile]);
 
+    useEffect(() => {
+        const url = uploadResult?.previewUrl;
+        if (!url) return;
+        return () => URL.revokeObjectURL(url);
+    }, [uploadResult?.previewUrl]);
+
+    const handleConfirmOcr = () => {
+        confirmOcr(
+            { filename: uploadResult?.fileName, ocrItems: uploadResult?.ocrItems },
+            {
+                onSuccess: (res) => {
+                    const { total, normal, need_checked } = res.data;
+                    setUploadResult({
+                        status: "success",
+                        uploadType: "file",
+                        fileName: uploadResult?.fileName,
+                        uploadedAt: new Date(),
+                        format: uploadResult?.format,
+                        total, normal, needChecked: need_checked,
+                    });
+                },
+                onError: (err) => {
+                    toast.error(err.response?.data?.message ?? t("toast.error_fallback"));
+                },
+            },
+        );
+    };
+
     return (
         <>
             <div>
@@ -61,17 +121,42 @@ export default function FileUploadSection({ onGoToManualEntry, initialFile }) {
                     1. {t("reg.tab.upload")}
                 </h4>
                 <div className="flex items-stretch gap-4">
-                    <FileUploader onFileSelected={handleFile} onGoToManualEntry={onGoToManualEntry} isUploading={isUploading} />
+                    {uploadResult?.status === "processing" ? (
+                        <ProcessingBox fileName={uploadResult.fileName} format={uploadResult.format} uploadedAt={uploadResult.uploadedAt} />
+                    ) : uploadResult?.status === "success" && uploadResult?.uploadType === "ocr" ? (
+                        <OcrCompleteBox fileName={uploadResult.fileName} format={uploadResult.format} uploadedAt={uploadResult.uploadedAt} />
+                    ) : (
+                        <FileUploader onFileSelected={handleFile} onOcrFileSelected={(file) => handleFile(file, "ocr")} isUploading={isUploading} />
+                    )}
                     <FileNoticeBox />
                 </div>
             </div>
+
+            {uploadResult?.status === "success" && uploadResult?.uploadType === "ocr" && uploadResult?.ocrItems?.length > 0 && (
+                <>
+                    <OcrComparisonCard fileName={uploadResult.fileName} format={uploadResult.format} previewUrl={uploadResult.previewUrl} ocrItems={uploadResult.ocrItems} />
+
+                    <ConfirmModal
+                        isOpen
+                        onCancel={() => setUploadResult(null)}
+                        onConfirm={handleConfirmOcr}
+                        isConfirming={isConfirmingOcr}
+                        confirmLoadingLabel={t("common.registering")}
+                    >
+                        <DataCompleteIcon className="h-auto w-14" />
+                        <p className="mt-2 text-lg font-bold text-gray-700">
+                            등록하시겠습니까?
+                        </p>
+                    </ConfirmModal>
+                </>
+            )}
 
             <RegisterResultBox uploadResult={uploadResult} onRetry={() => setUploadResult(null)} />
         </>
     );
 }
 
-function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
+function FileUploader({ onFileSelected, onOcrFileSelected, isUploading }) {
     const { t } = useTranslation();
     const [isDragging, setIsDragging] = useState(false);
 
@@ -98,9 +183,7 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
 
     const handleOcrInputChange = (e) => {
         const file = e.target.files?.[0];
-        if (file) {
-            onGoToManualEntry?.();
-        }
+        onOcrFileSelected(file);
     };
 
     return (
@@ -129,7 +212,7 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
                     {t("reg.upload.select_file")}
                     <input
                         type="file"
-                        accept=".xlsx,.csv"
+                        accept=".xlsx,.csv,.jpg,.jpeg,.png,.pdf"
                         className="hidden"
                         onChange={handleInputChange}
                         disabled={isUploading}
@@ -137,12 +220,162 @@ function FileUploader({ onFileSelected, onGoToManualEntry, isUploading }) {
                 </label>
 
                 <span className="text-[20px] text-gray-300">
-                    {t("reg.upload.supported_formats")} : xlsx, csv ...
+                    {t("reg.upload.supported_formats")} : xlsx, csv, jpg, png, pdf ...
                 </span>
             </div>
 
             <div className="mt-4 border-t border-gray-100 pt-4">
                 <OcrFileSelect onFileSelected={handleOcrInputChange} />
+            </div>
+        </div>
+    );
+}
+
+function ProcessingBox({ fileName, format, uploadedAt }) {
+    return (
+        <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
+            <DataProcessingIcon className="mb-4 h-auto w-24" />
+            <p className="text-primary-navy text-[28px] font-bold">
+                데이터 판별 중입니다...
+            </p>
+            <p className="mt-2 text-[20px] text-gray-300">
+                업로드한 파일에서 데이터를 추출하고 있습니다. 잠시만 기다려주세요.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
+                <div className="flex items-center gap-2 text-gray-500">
+                    <FileOutlineIcon className="size-6" />
+                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                </div>
+                <span className="text-nowrap text-[18px] text-gray-300">
+                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                </span>
+            </div>
+        </div>
+    );
+}
+
+function OcrCompleteBox({ fileName, format, uploadedAt }) {
+    return (
+        <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
+            <DataCompleteIcon className="mb-4 h-auto w-20" />
+            <p className="text-primary-navy text-[28px] font-bold">
+                데이터 판별이 완료되었습니다
+            </p>
+            <p className="mt-2 text-[20px] text-gray-300">
+                파일의 데이터를 분석하였습니다
+            </p>
+
+            <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
+                <div className="flex items-center gap-2 text-gray-500">
+                    <FileOutlineIcon className="size-6" />
+                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                </div>
+                <span className="text-nowrap text-[18px] text-gray-300">
+                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                </span>
+            </div>
+        </div>
+    );
+}
+
+function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
+    const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+
+    const COLUMNS = [
+        { key: "supplier_name", label: "공급사" },
+        { key: "raw_item_name", label: "품목명" },
+        { key: "spec", label: "규격" },
+        { key: "unit", label: "단위" },
+        { key: "price_before", label: "변경 전 단가", format: formatNumber },
+        { key: "price_after", label: "변경 후 단가", format: formatNumber },
+        { key: "effective_date", label: "적용일" },
+    ];
+
+    const fileInfo = (
+        <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 items-center gap-2 text-gray-500">
+                <FileOutlineIcon className="size-6 shrink-0" />
+                <span className="min-w-0 flex-1 break-words text-[20px]">파일명: {fileName ?? "-"}</span>
+            </div>
+            <span className="text-nowrap text-[18px] text-gray-300">
+                파일 형식: {format ?? "-"}
+            </span>
+        </div>
+    );
+
+    const table = (
+        <table className="min-w-[700px] border-collapse text-[16px]">
+            <thead>
+                <tr className="bg-surface-100 border-b border-gray-100">
+                    {COLUMNS.map(({ key, label }) => (
+                        <th key={key} className="px-2 py-3 text-center font-medium text-gray-500 whitespace-nowrap">
+                            {label}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {ocrItems.map((item, idx) => (
+                    <tr key={idx} className="border-b border-gray-100 last:border-0">
+                        {COLUMNS.map(({ key, format: formatValue }) => (
+                            <td key={key} className="px-2 py-3 text-center text-gray-500 whitespace-nowrap">
+                                {item[key] != null ? (formatValue ? formatValue(item[key]) : item[key]) : "-"}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+
+    if (previewUrl) {
+        return (
+            <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
+                <div className="flex min-w-0 flex-1 flex-col gap-3 border-r border-gray-100 pr-6 text-left">
+                    <div className="relative">
+                        <img
+                            src={previewUrl}
+                            alt={fileName ?? ""}
+                            className="h-64 w-full rounded-lg border border-gray-100 object-cover"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setIsImagePreviewOpen(true)}
+                            className="bg-gray-700/70 absolute top-2 right-2 flex size-8 items-center justify-center rounded-full transition-opacity hover:opacity-90"
+                        >
+                            <ZoomInIcon className="size-5" />
+                        </button>
+                    </div>
+                    {fileInfo}
+
+                    <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
+                        <DialogContent className="max-w-[92vw] sm:max-w-[92vw] border-none bg-transparent p-0 shadow-none ring-0">
+                            <DialogTitle className="sr-only">원본 이미지</DialogTitle>
+                            <img
+                                src={previewUrl}
+                                alt={fileName ?? ""}
+                                className="h-[88vh] w-[92vw] rounded-lg object-cover"
+                            />
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
+                <div className="min-w-0 shrink-0 overflow-x-auto">
+                    {table}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="my-8 flex gap-6 rounded-lg border border-gray-100 bg-white p-7">
+            <div className="flex w-1/4 min-w-0 flex-col gap-3 border-r border-gray-100 pr-6 text-left">
+                {fileInfo}
+            </div>
+
+            <div className="min-w-0 flex-1 overflow-x-auto">
+                {table}
             </div>
         </div>
     );
@@ -211,7 +444,11 @@ function RegisterResultBox({ uploadResult, onRetry }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    if (!uploadResult) {
+    if (!uploadResult || uploadResult.status === "processing") {
+        return null;
+    }
+
+    if (uploadResult.status === "success" && uploadResult.uploadType === "ocr") {
         return null;
     }
 
