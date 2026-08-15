@@ -32,7 +32,6 @@ export default function ExportHistoryPage() {
   const totalElements = data?.total_elements ?? 0;
   const totalPages = Math.max(1, data?.total_pages ?? 1);
 
-  // 백엔드가 필터 파라미터를 지원하지 않아 현재 페이지에 로드된 content 안에서만 필터링
   const filteredContent = useMemo(() => {
     const keyword = fileName.trim().toLowerCase();
     const content = data?.content ?? [];

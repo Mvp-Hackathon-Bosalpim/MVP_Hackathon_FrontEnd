@@ -289,14 +289,27 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
     const [zoom, setZoom] = useState(ZOOM_MIN);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
+    const [baseSize, setBaseSize] = useState(null);
     const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+    const lightboxImgRef = useRef(null);
 
     useEffect(() => {
         if (!isImagePreviewOpen) {
             setZoom(ZOOM_MIN);
             setPan({ x: 0, y: 0 });
+            setBaseSize(null);
         }
     }, [isImagePreviewOpen]);
+
+    const handleLightboxImgLoad = (e) => {
+        const { naturalWidth, naturalHeight } = e.target;
+        if (!naturalWidth || !naturalHeight) return;
+
+        const maxWidth = window.innerWidth * 0.97;
+        const maxHeight = window.innerHeight * 0.96;
+        const scale = Math.min(maxWidth / naturalWidth, maxHeight / naturalHeight, 1);
+        setBaseSize({ width: Math.round(naturalWidth * scale), height: Math.round(naturalHeight * scale) });
+    };
 
     const resetZoom = () => {
         setZoom(ZOOM_MIN);
@@ -328,9 +341,14 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
 
     const handleMouseMove = (e) => {
         if (!isDragging) return;
+        const nextX = dragStartRef.current.panX + (e.clientX - dragStartRef.current.x);
+        const nextY = dragStartRef.current.panY + (e.clientY - dragStartRef.current.y);
+
+        const maxPanX = baseSize ? (baseSize.width * (zoom - 1)) / 2 : 0;
+        const maxPanY = baseSize ? (baseSize.height * (zoom - 1)) / 2 : 0;
         setPan({
-            x: dragStartRef.current.panX + (e.clientX - dragStartRef.current.x),
-            y: dragStartRef.current.panY + (e.clientY - dragStartRef.current.y),
+            x: Math.min(maxPanX, Math.max(-maxPanX, nextX)),
+            y: Math.min(maxPanY, Math.max(-maxPanY, nextY)),
         });
     };
 
@@ -407,7 +425,7 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
                         <DialogContent className="max-w-[97vw] sm:max-w-[97vw] border-none bg-transparent p-0 shadow-none ring-0">
                             <DialogTitle className="sr-only">원본 이미지</DialogTitle>
                             <div
-                                className="relative mx-auto max-h-[96vh] max-w-[97vw] overflow-hidden rounded-lg"
+                                className="relative mx-auto w-fit max-h-[96vh] max-w-[97vw] overflow-hidden rounded-lg"
                                 onWheel={handleWheel}
                                 onMouseDown={handleMouseDown}
                                 onMouseMove={handleMouseMove}
@@ -416,15 +434,21 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
                                 onDoubleClick={handleDoubleClick}
                             >
                                 <img
+                                    ref={lightboxImgRef}
                                     src={previewUrl}
                                     alt={fileName ?? ""}
                                     draggable={false}
+                                    onLoad={handleLightboxImgLoad}
                                     className={cn(
-                                        "max-h-[96vh] max-w-[97vw] rounded-lg object-contain",
+                                        "rounded-lg object-contain",
+                                        !baseSize && "max-h-[96vh] max-w-[97vw]",
                                         !isDragging && "transition-transform",
                                         isDragging ? "cursor-grabbing" : zoom > ZOOM_MIN ? "cursor-grab" : "cursor-zoom-in",
                                     )}
-                                    style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+                                    style={{
+                                        ...(baseSize ? { width: `${baseSize.width}px`, height: `${baseSize.height}px` } : {}),
+                                        transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                                    }}
                                 />
                                 {zoom > ZOOM_MIN && (
                                     <button

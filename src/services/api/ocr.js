@@ -11,7 +11,7 @@ import client from "@/services/instance";
  * @property {string} unit
  * @property {number} price_before
  * @property {number} price_after
- * @property {string} effective_date - yyyy-MM-dd
+ * @property {string} effective_date 
  */
 
 /**
