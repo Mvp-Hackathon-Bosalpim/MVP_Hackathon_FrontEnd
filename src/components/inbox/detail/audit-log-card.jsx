@@ -22,12 +22,20 @@ function AuditLogCard({ changeLog = [] }) {
 
   const getFieldLabel = (field) => FIELD_LABEL_MAP[field] ?? field ?? "-";
 
+  const ACTION_MAP = {
+    edit: { label: "수정", color: "text-[#E38359]" },
+    approve: { label: "승인", color: "text-state-success" },
+    reject: { label: "반려", color: "text-state-error" },
+    re_review: { label: "재검토", color: "text-primary-navy" },
+  };
+
   const TABLE_HEADS = [
     t("common.date_time"),
     t("history.table.modifier"),
     t("history.table.change_item"),
     t("history.table.before_change"),
     t("history.table.after_change"),
+    t("history.table.action_result"),
     t("history.table.reason"),
   ];
 
@@ -59,7 +67,7 @@ function AuditLogCard({ changeLog = [] }) {
             {visible.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="py-12 text-center text-[18px] text-gray-300"
                 >
                   {t("detail.no_history")}
@@ -82,6 +90,14 @@ function AuditLogCard({ changeLog = [] }) {
                   </td>
                   <td className="px-6 py-4 text-[18px] text-gray-500">
                     {log.to ?? "-"}
+                  </td>
+                  <td
+                    className={cn(
+                      "px-6 py-4 text-[18px] font-semibold",
+                      ACTION_MAP[log.action]?.color ?? "text-gray-500",
+                    )}
+                  >
+                    {ACTION_MAP[log.action]?.label ?? log.action ?? "-"}
                   </td>
                   <td className="px-6 py-4 text-[18px] text-gray-500">
                     {log.memo ?? "-"}
