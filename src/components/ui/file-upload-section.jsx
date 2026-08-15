@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -279,8 +279,62 @@ function OcrCompleteBox({ fileName, format, uploadedAt }) {
     );
 }
 
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 4;
+const ZOOM_STEP = 0.2;
+const DOUBLE_CLICK_ZOOM = 2;
+
 function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
     const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+    const [zoom, setZoom] = useState(ZOOM_MIN);
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+
+    useEffect(() => {
+        if (!isImagePreviewOpen) {
+            setZoom(ZOOM_MIN);
+            setPan({ x: 0, y: 0 });
+        }
+    }, [isImagePreviewOpen]);
+
+    const resetZoom = () => {
+        setZoom(ZOOM_MIN);
+        setPan({ x: 0, y: 0 });
+    };
+
+    const handleDoubleClick = () => {
+        if (zoom > ZOOM_MIN) {
+            resetZoom();
+        } else {
+            setZoom(DOUBLE_CLICK_ZOOM);
+        }
+    };
+
+    const handleWheel = (e) => {
+        e.preventDefault();
+        setZoom((z) => {
+            const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(z + (e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP)).toFixed(2)));
+            if (next === ZOOM_MIN) setPan({ x: 0, y: 0 });
+            return next;
+        });
+    };
+
+    const handleMouseDown = (e) => {
+        if (zoom <= ZOOM_MIN) return;
+        setIsDragging(true);
+        dragStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        setPan({
+            x: dragStartRef.current.panX + (e.clientX - dragStartRef.current.x),
+            y: dragStartRef.current.panY + (e.clientY - dragStartRef.current.y),
+        });
+    };
+
+    const handleMouseUp = () => setIsDragging(false);
 
     const COLUMNS = [
         { key: "supplier_name", label: "공급사" },
@@ -350,13 +404,38 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
                     {fileInfo}
 
                     <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
-                        <DialogContent className="max-w-[92vw] sm:max-w-[92vw] border-none bg-transparent p-0 shadow-none ring-0">
+                        <DialogContent className="max-w-[97vw] sm:max-w-[97vw] border-none bg-transparent p-0 shadow-none ring-0">
                             <DialogTitle className="sr-only">원본 이미지</DialogTitle>
-                            <img
-                                src={previewUrl}
-                                alt={fileName ?? ""}
-                                className="h-[88vh] w-[92vw] rounded-lg object-cover"
-                            />
+                            <div
+                                className="relative mx-auto max-h-[96vh] max-w-[97vw] overflow-hidden rounded-lg"
+                                onWheel={handleWheel}
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
+                                onMouseUp={handleMouseUp}
+                                onMouseLeave={handleMouseUp}
+                                onDoubleClick={handleDoubleClick}
+                            >
+                                <img
+                                    src={previewUrl}
+                                    alt={fileName ?? ""}
+                                    draggable={false}
+                                    className={cn(
+                                        "max-h-[96vh] max-w-[97vw] rounded-lg object-contain",
+                                        !isDragging && "transition-transform",
+                                        isDragging ? "cursor-grabbing" : zoom > ZOOM_MIN ? "cursor-grab" : "cursor-zoom-in",
+                                    )}
+                                    style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+                                />
+                                {zoom > ZOOM_MIN && (
+                                    <button
+                                        type="button"
+                                        onClick={resetZoom}
+                                        className="bg-gray-700/70 text-surface-0 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-medium"
+                                    >
+                                        원래 크기로
+                                    </button>
+                                )}
+                            </div>
                         </DialogContent>
                     </Dialog>
                 </div>
