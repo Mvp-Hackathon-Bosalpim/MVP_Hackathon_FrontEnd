@@ -171,7 +171,8 @@
       "approve_selected": "Approve Selected",
       "reject_selected": "Reject Selected",
       "export_json": "Export (JSON)",
-      "export_csv": "Export (CSV)"
+      "export_csv": "Export (CSV)",
+      "delete_selected": "Delete Selected"
     },
     "modal": {
       "approve_title": "Confirm Approval",

@@ -23,10 +23,10 @@ function AuditLogCard({ changeLog = [] }) {
   const getFieldLabel = (field) => FIELD_LABEL_MAP[field] ?? field ?? "-";
 
   const ACTION_MAP = {
-    edit: { label: "수정", color: "text-[#E38359]" },
-    approve: { label: "승인", color: "text-state-success" },
-    reject: { label: "반려", color: "text-state-error" },
-    re_review: { label: "재검토", color: "text-primary-navy" },
+    edit: { label: t("changelog.action.EDIT"), color: "text-[#E38359]" },
+    approve: { label: t("changelog.action.APPROVE"), color: "text-state-success" },
+    reject: { label: t("changelog.action.REJECT"), color: "text-state-error" },
+    re_review: { label: t("changelog.action.RE_REVIEW"), color: "text-primary-navy" },
   };
 
   const TABLE_HEADS = [

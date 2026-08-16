@@ -84,7 +84,7 @@ function InboxExportModal({ isOpen, onClose }) {
               {t("export.approved_completed")}
             </p>
             <p className="text-base text-gray-500">
-              총 <strong className="text-gray-700">{approvedCount}</strong> 건
+              {t("export.total_items", { count: approvedCount })}
             </p>
           </div>
 

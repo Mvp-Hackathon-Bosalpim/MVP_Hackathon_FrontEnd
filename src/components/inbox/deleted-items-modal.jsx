@@ -15,7 +15,6 @@ const PAGE_SIZE_DEFAULT = 20;
 const DELETED_BADGE = {
   dot: "bg-gray-400",
   text: "text-gray-600",
-  label: "삭제",
 };
 
 function SourceTypeBadge({ sourceType }) {
@@ -27,11 +26,12 @@ function SourceTypeBadge({ sourceType }) {
 }
 
 function DeletedStatusBadge() {
+  const { t } = useTranslation();
   return (
     <div className="inline-flex items-center gap-2 rounded-full bg-[#DEE1E5] px-4 py-1">
       <span className={cn("size-2.5 rounded-full", DELETED_BADGE.dot)} />
       <span className={cn("text-[18px] font-bold", DELETED_BADGE.text)}>
-        {DELETED_BADGE.label}
+        {t("inbox.modal.delete_confirm")}
       </span>
     </div>
   );

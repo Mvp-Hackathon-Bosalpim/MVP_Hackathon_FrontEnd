@@ -103,7 +103,7 @@ function InboxResultFooter({
                 className="size-6 border-gray-700 data-checked:bg-gray-700"
               />
               <span className="text-[20px] text-gray-500">
-                {selectedCount}개 선택됨
+                {t("common.n_selected", { count: selectedCount })}
               </span>
               <button
                 type="button"
@@ -112,7 +112,7 @@ function InboxResultFooter({
                 className="flex items-center gap-2 border border-gray-100 px-4 py-2 text-base disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Trash2 className="size-4" />
-                선택 삭제
+                {t("inbox.action.delete_selected")}
               </button>
               <button
                 type="button"

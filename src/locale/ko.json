@@ -171,7 +171,8 @@
       "approve_selected": "선택 항목 승인",
       "reject_selected": "선택 항목 반려",
       "export_json": "내보내기 (JSON)",
-      "export_csv": "내보내기 (CSV)"
+      "export_csv": "내보내기 (CSV)",
+      "delete_selected": "선택 삭제"
     },
     "modal": {
       "approve_title": "승인 확인",
