@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// 일시 미선택 상태(현재 연도 기준)
 const currentYear = new Date().getFullYear();
 const UNSELECTED_LABEL = `${currentYear}-00-00 ${currentYear}-00-00`;
 
@@ -16,7 +15,6 @@ function formatDate(date) {
   return `${y}-${m}-${d}`;
 }
 
-// "2026-08-03" 같은 문자열을 Date로 변환, 형식이 안 맞으면 null
 function parseDateInput(value) {
   const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return null;
@@ -80,7 +78,7 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
   const [draftRange, setDraftRange] = useState(
     range ?? { start: null, end: null },
   );
-  // 시작일/종료일 입력창(타이핑 반영용)
+
   const [startInput, setStartInput] = useState("");
   const [endInput, setEndInput] = useState("");
 
@@ -229,28 +227,26 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
                       key={idx}
                       className="relative flex items-center justify-center py-1"
                     >
-                      {/* 시작일~종료일 사이를 이어주는 연한 배경 (원형 버튼 뒤에 깔림) */}
+                      {/* 시작일~종료일 사이 연결 */}
                       {hasRangeBg && (
                         <div
-                          className={`bg-primary-navy/10 absolute inset-y-1 ${
-                            isStart
-                              ? "right-0 left-1/2"
-                              : isEnd
-                                ? "right-1/2 left-0"
-                                : "right-0 left-0"
-                          }`}
+                          className={`bg-primary-navy/10 absolute inset-y-1 ${isStart
+                            ? "right-0 left-1/2"
+                            : isEnd
+                              ? "right-1/2 left-0"
+                              : "right-0 left-0"
+                            }`}
                         />
                       )}
                       <button
                         type="button"
                         onClick={() => handleDayClick(cell.date)}
-                        className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors ${
-                          !cell.current
-                            ? "hover:bg-surface-100 text-gray-200"
-                            : isStart || isEnd
-                              ? "bg-primary-navy font-semibold text-white"
-                              : "hover:bg-surface-100 text-gray-500"
-                        }`}
+                        className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm transition-colors ${!cell.current
+                          ? "hover:bg-surface-100 text-gray-200"
+                          : isStart || isEnd
+                            ? "bg-primary-navy font-semibold text-white"
+                            : "hover:bg-surface-100 text-gray-500"
+                          }`}
                       >
                         {cell.date.getDate()}
                       </button>
@@ -260,7 +256,7 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
               </div>
             </div>
 
-            {/* 오른쪽: 선택한 기간 요약 (입력 가능) */}
+            {/*  선택한 기간  */}
             <div className="w-[240px] p-4">
               <p className="mb-4 text-sm font-semibold text-gray-700">
                 {t("datepicker.selected_period")}
@@ -299,7 +295,7 @@ export default function ExportDateRangePicker({ range, onRangeChange }) {
             </div>
           </div>
 
-          {/* 하단: 초기화 / 적용 버튼 */}
+          {/* 초기화 / 적용 버튼 */}
           <div className="border-surface-200 flex gap-2 border-t p-4">
             <button
               type="button"

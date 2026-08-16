@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -145,7 +145,7 @@ export default function FileUploadSection({ initialFile }) {
                     >
                         <DataCompleteIcon className="h-auto w-14" />
                         <p className="mt-2 text-lg font-bold text-gray-700">
-                            등록하시겠습니까?
+                            {t("reg.upload.confirm_register")}
                         </p>
                     </ConfirmModal>
                 </>
@@ -232,23 +232,24 @@ function FileUploader({ onFileSelected, onOcrFileSelected, isUploading }) {
 }
 
 function ProcessingBox({ fileName, format, uploadedAt }) {
+    const { t } = useTranslation();
     return (
         <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
             <DataProcessingIcon className="mb-4 h-auto w-24" />
             <p className="text-primary-navy text-[28px] font-bold">
-                데이터 판별 중입니다...
+                {t("reg.upload.processing_title")}
             </p>
             <p className="mt-2 text-[20px] text-gray-300">
-                업로드한 파일에서 데이터를 추출하고 있습니다. 잠시만 기다려주세요.
+                {t("reg.upload.processing_desc")}
             </p>
 
             <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
                 <div className="flex items-center gap-2 text-gray-500">
                     <FileOutlineIcon className="size-6" />
-                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                    <span className="text-nowrap text-[20px]">{t("common.file_name")}: {fileName ?? "-"}</span>
                 </div>
                 <span className="text-nowrap text-[18px] text-gray-300">
-                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                    {t("reg.upload.file_format")}: {format ?? "-"} · {t("reg.upload.upload_time")}: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
                 </span>
             </div>
         </div>
@@ -256,50 +257,133 @@ function ProcessingBox({ fileName, format, uploadedAt }) {
 }
 
 function OcrCompleteBox({ fileName, format, uploadedAt }) {
+    const { t } = useTranslation();
     return (
         <div className="border-primary-navy flex h-full w-2/3 flex-col items-center justify-center rounded-lg border bg-white p-4 text-center">
             <DataCompleteIcon className="mb-4 h-auto w-20" />
             <p className="text-primary-navy text-[28px] font-bold">
-                데이터 판별이 완료되었습니다
+                {t("reg.upload.complete_title")}
             </p>
             <p className="mt-2 text-[20px] text-gray-300">
-                파일의 데이터를 분석하였습니다
+                {t("reg.upload.complete_desc")}
             </p>
 
             <div className="mt-6 flex flex-col gap-1 rounded-lg border border-gray-100 p-6 text-left">
                 <div className="flex items-center gap-2 text-gray-500">
                     <FileOutlineIcon className="size-6" />
-                    <span className="text-nowrap text-[20px]">파일명: {fileName ?? "-"}</span>
+                    <span className="text-nowrap text-[20px]">{t("common.file_name")}: {fileName ?? "-"}</span>
                 </div>
                 <span className="text-nowrap text-[18px] text-gray-300">
-                    파일 형식: {format ?? "-"} · 업로드 시간: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
+                    {t("reg.upload.file_format")}: {format ?? "-"} · {t("reg.upload.upload_time")}: {uploadedAt ? formatUploadTime(uploadedAt) : "-"}
                 </span>
             </div>
         </div>
     );
 }
 
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 4;
+const ZOOM_STEP = 0.2;
+const DOUBLE_CLICK_ZOOM = 2;
+
 function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
+    const { t } = useTranslation();
     const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+    const [zoom, setZoom] = useState(ZOOM_MIN);
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [baseSize, setBaseSize] = useState(null);
+    const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+    const lightboxImgRef = useRef(null);
+
+    useEffect(() => {
+        if (!isImagePreviewOpen) {
+            setZoom(ZOOM_MIN);
+            setPan({ x: 0, y: 0 });
+            setBaseSize(null);
+        }
+    }, [isImagePreviewOpen]);
+
+    useEffect(() => {
+        if (!isImagePreviewOpen) return;
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") setIsImagePreviewOpen(false);
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isImagePreviewOpen]);
+
+    const handleLightboxImgLoad = (e) => {
+        const { naturalWidth, naturalHeight } = e.target;
+        if (!naturalWidth || !naturalHeight) return;
+
+        const maxWidth = window.innerWidth * 0.97;
+        const maxHeight = window.innerHeight * 0.96;
+        const scale = Math.min(maxWidth / naturalWidth, maxHeight / naturalHeight, 1);
+        setBaseSize({ width: Math.round(naturalWidth * scale), height: Math.round(naturalHeight * scale) });
+    };
+
+    const resetZoom = () => {
+        setZoom(ZOOM_MIN);
+        setPan({ x: 0, y: 0 });
+    };
+
+    const handleDoubleClick = () => {
+        if (zoom > ZOOM_MIN) {
+            resetZoom();
+        } else {
+            setZoom(DOUBLE_CLICK_ZOOM);
+        }
+    };
+
+    const handleWheel = (e) => {
+        e.preventDefault();
+        setZoom((z) => {
+            const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(z + (e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP)).toFixed(2)));
+            if (next === ZOOM_MIN) setPan({ x: 0, y: 0 });
+            return next;
+        });
+    };
+
+    const handleMouseDown = (e) => {
+        if (zoom <= ZOOM_MIN) return;
+        setIsDragging(true);
+        dragStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        const nextX = dragStartRef.current.panX + (e.clientX - dragStartRef.current.x);
+        const nextY = dragStartRef.current.panY + (e.clientY - dragStartRef.current.y);
+
+        const maxPanX = baseSize ? (baseSize.width * (zoom - 1)) / 2 : 0;
+        const maxPanY = baseSize ? (baseSize.height * (zoom - 1)) / 2 : 0;
+        setPan({
+            x: Math.min(maxPanX, Math.max(-maxPanX, nextX)),
+            y: Math.min(maxPanY, Math.max(-maxPanY, nextY)),
+        });
+    };
+
+    const handleMouseUp = () => setIsDragging(false);
 
     const COLUMNS = [
-        { key: "supplier_name", label: "공급사" },
-        { key: "raw_item_name", label: "품목명" },
-        { key: "spec", label: "규격" },
-        { key: "unit", label: "단위" },
-        { key: "price_before", label: "변경 전 단가", format: formatNumber },
-        { key: "price_after", label: "변경 후 단가", format: formatNumber },
-        { key: "effective_date", label: "적용일" },
+        { key: "supplier_name", label: t("reg.upload.col_supplier") },
+        { key: "raw_item_name", label: t("reg.upload.col_item_name") },
+        { key: "spec", label: t("reg.upload.col_spec") },
+        { key: "unit", label: t("reg.upload.col_unit") },
+        { key: "price_before", label: t("reg.upload.col_price_before"), format: formatNumber },
+        { key: "price_after", label: t("reg.upload.col_price_after"), format: formatNumber },
+        { key: "effective_date", label: t("reg.upload.col_applied_date") },
     ];
 
     const fileInfo = (
         <div className="flex flex-col gap-1">
             <div className="flex min-w-0 items-center gap-2 text-gray-500">
                 <FileOutlineIcon className="size-6 shrink-0" />
-                <span className="min-w-0 flex-1 break-words text-[20px]">파일명: {fileName ?? "-"}</span>
+                <span className="min-w-0 flex-1 break-words text-[20px]">{t("common.file_name")}: {fileName ?? "-"}</span>
             </div>
             <span className="text-nowrap text-[18px] text-gray-300">
-                파일 형식: {format ?? "-"}
+                {t("reg.upload.file_format")}: {format ?? "-"}
             </span>
         </div>
     );
@@ -350,13 +434,44 @@ function OcrComparisonCard({ fileName, format, previewUrl, ocrItems }) {
                     {fileInfo}
 
                     <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
-                        <DialogContent className="max-w-[92vw] sm:max-w-[92vw] border-none bg-transparent p-0 shadow-none ring-0">
-                            <DialogTitle className="sr-only">원본 이미지</DialogTitle>
-                            <img
-                                src={previewUrl}
-                                alt={fileName ?? ""}
-                                className="h-[88vh] w-[92vw] rounded-lg object-cover"
-                            />
+                        <DialogContent className="max-w-[97vw] sm:max-w-[97vw] border-none bg-transparent p-0 shadow-none ring-0">
+                            <DialogTitle className="sr-only">{t("reg.upload.original_image")}</DialogTitle>
+                            <div
+                                className="relative mx-auto w-fit max-h-[96vh] max-w-[97vw] overflow-hidden rounded-lg"
+                                onWheel={handleWheel}
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
+                                onMouseUp={handleMouseUp}
+                                onMouseLeave={handleMouseUp}
+                                onDoubleClick={handleDoubleClick}
+                            >
+                                <img
+                                    ref={lightboxImgRef}
+                                    src={previewUrl}
+                                    alt={fileName ?? ""}
+                                    draggable={false}
+                                    onLoad={handleLightboxImgLoad}
+                                    className={cn(
+                                        "rounded-lg object-contain",
+                                        !baseSize && "max-h-[96vh] max-w-[97vw]",
+                                        !isDragging && "transition-transform",
+                                        isDragging ? "cursor-grabbing" : zoom > ZOOM_MIN ? "cursor-grab" : "cursor-zoom-in",
+                                    )}
+                                    style={{
+                                        ...(baseSize ? { width: `${baseSize.width}px`, height: `${baseSize.height}px` } : {}),
+                                        transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                                    }}
+                                />
+                                {zoom > ZOOM_MIN && (
+                                    <button
+                                        type="button"
+                                        onClick={resetZoom}
+                                        className="bg-gray-700/70 text-surface-0 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-medium"
+                                    >
+                                        {t("reg.upload.reset_zoom")}
+                                    </button>
+                                )}
+                            </div>
                         </DialogContent>
                     </Dialog>
                 </div>

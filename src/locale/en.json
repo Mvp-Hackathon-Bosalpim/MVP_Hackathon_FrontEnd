@@ -26,6 +26,10 @@
     "n_selected": "{{count}} selected",
     "view_per_page": "View {{count}} per page"
   },
+  "not_found": {
+    "message": "Page not found.",
+    "back_home": "Back to Home"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "registration": "Registration",
@@ -91,7 +95,23 @@
       "exception_count": "Exception Count",
       "check_inbox_desc": "Please check and inspect exception/error data in the inbox.",
       "go_to_inbox": "Go to Inbox",
-      "upload_failed_default": "Upload failed."
+      "upload_failed_default": "Upload failed.",
+      "confirm_register": "Are you sure you want to register?",
+      "processing_title": "Analyzing data...",
+      "processing_desc": "Extracting data from the uploaded file. Please wait a moment.",
+      "complete_title": "Data analysis complete",
+      "complete_desc": "The file data has been analyzed",
+      "file_format": "File Format",
+      "upload_time": "Upload Time",
+      "original_image": "Original Image",
+      "reset_zoom": "Reset Size",
+      "col_supplier": "Supplier",
+      "col_item_name": "Item Name",
+      "col_spec": "Spec",
+      "col_unit": "Unit",
+      "col_price_before": "Price Before",
+      "col_price_after": "Price After",
+      "col_applied_date": "Applied Date"
     },
     "manual": {
       "desc": "Manual Registration (Enter directly if you don't have a file)",

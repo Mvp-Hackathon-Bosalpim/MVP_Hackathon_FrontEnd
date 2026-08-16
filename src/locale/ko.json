@@ -26,6 +26,10 @@
     "n_selected": "{{count}}개 선택",
     "view_per_page": "{{count}}개씩 보기"
   },
+  "not_found": {
+    "message": "페이지를 찾을 수 없습니다.",
+    "back_home": "홈으로 돌아가기"
+  },
   "nav": {
     "dashboard": "대시보드",
     "registration": "등록",
@@ -91,7 +95,23 @@
       "exception_count": "예외 건수",
       "check_inbox_desc": "예외/오류 데이터는 인박스에서 확인 및 검수해주세요.",
       "go_to_inbox": "인박스로 이동",
-      "upload_failed_default": "업로드에 실패했습니다."
+      "upload_failed_default": "업로드에 실패했습니다.",
+      "confirm_register": "등록하시겠습니까?",
+      "processing_title": "데이터 판별 중입니다...",
+      "processing_desc": "업로드한 파일에서 데이터를 추출하고 있습니다. 잠시만 기다려주세요.",
+      "complete_title": "데이터 판별이 완료되었습니다",
+      "complete_desc": "파일의 데이터를 분석하였습니다",
+      "file_format": "파일 형식",
+      "upload_time": "업로드 시간",
+      "original_image": "원본 이미지",
+      "reset_zoom": "원래 크기로",
+      "col_supplier": "공급사",
+      "col_item_name": "품목명",
+      "col_spec": "규격",
+      "col_unit": "단위",
+      "col_price_before": "변경 전 단가",
+      "col_price_after": "변경 후 단가",
+      "col_applied_date": "적용일"
     },
     "manual": {
       "desc": "수기 등록 (파일이 없을 경우 직접 입력하세요)",
